@@ -1,3 +1,6 @@
+mtcars_db <- cbind(name = rownames(mtcars), mtcars)
+rownames(mtcars_db) <- NULL
+
 test_prepare_example <- function(examples, data) {
   tmp <- tempfile()
   withr::defer_parent(unlink(tmp, recursive = TRUE))
