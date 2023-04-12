@@ -53,21 +53,20 @@ connections <- R6::R6Class(
   ))
 
 
-open_connection <- function(path, config, database) {
-  connections <- local_connections(path, config)$open(database)
-}
-
-
-close_all_connections <- function(path, config) {
-  local_connections(path, config)$close_all()
+open_connection <- function(path, config, env, database) {
+  connections <- local_connections(path, config, env)$open(database)
 }
 
 
 local <- new.env(parent = emptyenv())
-local_connections <- function(key, config) {
+local_connections <- function(key, config, env) {
   obj <- local[[key]]
   if (is.null(obj) || !identical(obj$config, config)) {
     local[[key]] <- connections$new(config)
+    reg.finalizer(env, function(e) {
+      local[[key]]$close_all()
+      local[[key]] <- NULL
+    })
   }
   local[[key]]
 }

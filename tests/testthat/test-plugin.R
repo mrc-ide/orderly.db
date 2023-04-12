@@ -47,7 +47,7 @@ test_that("allow connection", {
   ## Force cleanup, check it closes connection:
   rm(env)
   gc()
-  ## expect_false(DBI::dbIsValid(con)) # TODO
+  expect_false(DBI::dbIsValid(con))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
   meta_db <- meta$custom$orderly$plugins$orderly3.db
