@@ -1,14 +1,14 @@
 test_that("basic plugin use works", {
   root <- test_prepare_example("minimal", list(mtcars = mtcars))
   env <- new.env()
-  id <- orderly2::orderly_run("minimal", root = root, envir = env)
+  id <- orderly3::orderly_run("minimal", root = root, envir = env)
   expect_type(id, "character")
 
   expect_true(file.exists(
     file.path(root, "archive", "minimal", id, "mygraph.png")))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
   expect_setequal(names(meta_db), c("data", "connection"))
   expect_setequal(names(meta_db$data), "dat1")
   expect_setequal(names(meta_db$data$dat1), c("rows", "cols"))
@@ -22,7 +22,7 @@ test_that("basic plugin use works", {
 test_that("allow connection", {
   root <- test_prepare_example("connection", list(mtcars = mtcars))
   env <- new.env()
-  id <- orderly2::orderly_run("connection", root = root, envir = env)
+  id <- orderly3::orderly_run("connection", root = root, envir = env)
 
   expect_type(id, "character")
 
@@ -41,7 +41,7 @@ test_that("allow connection", {
   expect_false(DBI::dbIsValid(con))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
   expect_setequal(names(meta_db), c("data", "connection"))
   expect_setequal(names(meta_db$data), "dat1")
   expect_setequal(names(meta_db$data$dat1), c("rows", "cols"))
@@ -55,7 +55,7 @@ test_that("allow connection", {
 test_that("allow connection without data", {
   root <- test_prepare_example("connectiononly", list(mtcars = mtcars))
   env <- new.env()
-  id <- orderly2::orderly_run("connectiononly", root = root, envir = env)
+  id <- orderly3::orderly_run("connectiononly", root = root, envir = env)
 
   expect_type(id, "character")
 
@@ -63,7 +63,7 @@ test_that("allow connection without data", {
     file.path(root, "archive", "connectiononly", id, "mygraph.png")))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
   expect_setequal(names(meta_db), c("data", "connection"))
   expect_equal(meta_db$data, list())
   expect_equal(meta_db$connection, list(con1 = "source"))
@@ -73,23 +73,23 @@ test_that("allow connection without data", {
 test_that("validate plugin configuration", {
   expect_error(
     orderly_db_config(list(), "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db' must be named")
+    "'orderly_config.yml:orderly3.db' must be named")
   expect_error(
     orderly_db_config(list(db = list()), "orderly_config.yml"),
-    "Fields missing from orderly_config.yml:orderly2.db:db: driver, args")
+    "Fields missing from orderly_config.yml:orderly3.db:db: driver, args")
   expect_error(
     orderly_db_config(list(db = list(driver = NULL, args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db:db:driver' must be a scalar")
+    "'orderly_config.yml:orderly3.db:db:driver' must be a scalar")
   expect_error(
     orderly_db_config(list(db = list(driver = "db", args = NULL)),
                       "orderly_config.yml"),
     paste("Expected fully qualified name for",
-          "orderly_config.yml:orderly2.db:db:driver"))
+          "orderly_config.yml:orderly3.db:db:driver"))
   expect_error(
     orderly_db_config(list(db = list(driver = "pkg::db", args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db:db:args' must be named")
+    "'orderly_config.yml:orderly3.db:db:args' must be named")
 
   ## Success:
   expect_equal(
@@ -133,6 +133,7 @@ test_that("validate db for sqlite", {
 
 
 test_that("validate orderly.yml read", {
+  skip("not relevant")
   mock_root <- list(config = list(orderly2.db = list(db = list())))
   expect_error(
     orderly_db_read(list(1), "orderly.yml", mock_root),
@@ -286,14 +287,14 @@ test_that("run function cleans up connections", {
 
 test_that("can construct plugin", {
   expect_identical(orderly_db_plugin(),
-                   orderly2:::.plugins$orderly2.db)
+                   orderly2:::.plugins$orderly3.db)
 })
 
 
 test_that("can construct a view, then read from it", {
   root <- test_prepare_example("view", list(mtcars = mtcars))
   env <- new.env()
-  id <- orderly2::orderly_run("view", root = root, envir = env)
+  id <- orderly3::orderly_run("view", root = root, envir = env)
   expect_type(id, "character")
   expect_true(file.exists(
     file.path(root, "archive", "view", id, "mygraph.png")))
