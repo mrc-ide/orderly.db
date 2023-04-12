@@ -1,4 +1,7 @@
 orderly_db_config <- function(data, filename) {
+  if (length(data) == 0) {
+    stop(sprintf("%s:orderly3.db must contain at least one database", filename))
+  }
   assert_named(data, unique = TRUE, name = sprintf("%s:orderly3.db", filename))
   for (nm in names(data)) {
     db <- data[[nm]]

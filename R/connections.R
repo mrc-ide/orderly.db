@@ -13,12 +13,6 @@ connections <- R6::R6Class(
     config = NULL,
 
     initialize = function(config) {
-      ## This probably belongs elsewhere really, but it is always
-      ## called here.
-      if (is.null(config)) {
-        stop("Your database set up is not configured?")
-      }
-      stopifnot(length(config) > 0)
       self$config <- config
       private$connections <- list()
       lockBinding("config", self)

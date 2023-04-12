@@ -6,21 +6,27 @@ test_prepare_example <- function(examples, data) {
   withr::defer_parent(unlink(tmp, recursive = TRUE))
   orderly3:::orderly_init(tmp)
 
+  fmt <- paste(
+    "    %s:",
+    "      driver: RSQLite::SQLite",
+    "      args:",
+    "        dbname: %s.sqlite",
+    sep = "\n")
+
   writeLines(c(
     "plugins:",
     "  orderly3.db:",
-    "    source:",
-    "      driver: RSQLite::SQLite",
-    "      args:",
-    "        dbname: source.sqlite"),
+    sprintf(fmt, names(data), names(data))),
     file.path(tmp, "orderly_config.yml"))
 
-  con <- DBI::dbConnect(RSQLite::SQLite(),
-                        dbname = file.path(tmp, "source.sqlite"))
-  for (nm in names(data)) {
-    DBI::dbWriteTable(con, nm, data[[nm]])
+  for (nm_db in names(data)) {
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          dbname = file.path(tmp, paste0(nm_db, ".sqlite")))
+    for (nm_data in names(data[[nm_db]])) {
+      DBI::dbWriteTable(con, nm_data, data[[nm_db]][[nm_data]])
+    }
+    DBI::dbDisconnect(con)
   }
-  DBI::dbDisconnect(con)
 
   fs::dir_create(file.path(tmp, "src"))
   for (i in examples) {
