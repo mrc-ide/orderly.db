@@ -16,3 +16,4 @@ assert_scalar_character <- orderly3:::assert_scalar_character
 assert_character <- orderly3:::assert_character
 match_value <- orderly3:::match_value
 squote <- orderly3:::squote
+file_exists <- orderly3:::file_exists

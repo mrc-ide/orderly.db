@@ -12,8 +12,8 @@
 ##' @export
 orderly_db_view <- function(query, as, database = NULL) {
   assert_scalar_character(as)
-  assert_character(query)
   ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  query <- check_query(query, ctx)
   con <- open_connection(ctx$path, ctx$config, ctx$env, database)
   sql <- sprintf("CREATE TEMPORARY VIEW %s AS\n%s", as, query)
   DBI::dbExecute(con$connection, sql)
@@ -39,9 +39,9 @@ orderly_db_view <- function(query, as, database = NULL) {
 ##' @export
 orderly_db_query <- function(query, as, database = NULL) {
   assert_scalar_character(as)
-  assert_character(query)
   ctx <- orderly3::orderly_plugin_context("orderly3.db")
   con <- open_connection(ctx$path, ctx$config, ctx$env, database)
+  query <- check_query(query, ctx)
   d <- DBI::dbGetQuery(con$connection, query)
   ctx$env[[as]] <- d
   info <- list(database = con$database, as = as, query = query,
@@ -68,4 +68,15 @@ orderly_db_connection <- function(as, database = NULL) {
   ctx$env[[as]] <- con$connection
   info <- list(database = con$database, as = as)
   orderly3::orderly_plugin_add_metadata("orderly3.db", "connection", info)
+}
+
+
+check_query <- function(query, context) {
+  assert_character(query)
+  if (file_exists(query, workdir = context$src)) {
+    ## Once outpack only copies some files over we'll want to copy
+    ## this too, but that needs to wait for strict mode really.
+    query <- readLines(file.path(context$src, query))
+  }
+  query
 }

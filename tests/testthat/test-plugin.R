@@ -204,3 +204,16 @@ test_that("can construct a view, then read from it", {
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
 })
+
+
+test_that("can read a query from a file", {
+  root <- test_prepare_example("query",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("query", root = root, envir = env)
+
+  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_equal(meta_db$query[[1]]$query,
+               readLines(file.path(root, "src", "query", "query.sql")))
+})
