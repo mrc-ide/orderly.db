@@ -35,3 +35,8 @@ test_prepare_example <- function(examples, data) {
 
   tmp
 }
+
+
+clear_local_connections <- function() {
+  rm(list = names(local), envir = local)
+}
