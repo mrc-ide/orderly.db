@@ -55,3 +55,9 @@ orderly_db_serialise <- function(data) {
   jsonlite::toJSON(data, auto_unbox = FALSE, pretty = FALSE, na = "null",
                    null = "null")
 }
+
+
+orderly_db_cleanup <- function() {
+  ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  local_connections_close(ctx$path)
+}

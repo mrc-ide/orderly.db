@@ -40,8 +40,22 @@ test_that("find and clean local connections", {
 
   con <- obj$open(NULL)
   expect_true(DBI::dbIsValid(con$connection))
-  rm(env)
-  gc()
+  obj$close_all()
 
   expect_false(DBI::dbIsValid(con$connection))
+})
+
+
+test_that("changing the configuration invalidates connections", {
+  clear_local_connections()
+  env <- new.env()
+  key <- "/some/path"
+  cfg <- list(driver = c("RSQLite", "SQLite"), path = ":memory:")
+  config1 <- list(db1 = cfg)
+  config2 <- list(db1 = cfg, db2 = cfg)
+  obj1 <- local_connections(key, config1, env)
+  con1 <- obj1$open("db1")
+  expect_true(DBI::dbIsValid(con1$connection))
+  obj2 <- local_connections(key, config2, env)
+  expect_false(DBI::dbIsValid(con1$connection))
 })

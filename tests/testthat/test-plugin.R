@@ -38,16 +38,8 @@ test_that("allow connection", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  ## Save a copy of the connection out:
-  con <- env$con
-  expect_s4_class(con, "SQLiteConnection")
-  expect_true(DBI::dbIsValid(con))
-  expect_equal(DBI::dbListTables(con), "mtcars") # still works
-
-  ## Force cleanup, check it closes connection:
-  rm(env)
-  gc()
-  expect_false(DBI::dbIsValid(con))
+  ## Connection should now have been invalidated:
+  expect_false(DBI::dbIsValid(env$con))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
   meta_db <- meta$custom$orderly$plugins$orderly3.db
