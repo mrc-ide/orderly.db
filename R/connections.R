@@ -14,17 +14,21 @@ connections <- R6::R6Class(
       lockBinding("config", self)
     },
 
-    open = function(database) {
+    open = function(database, instance) {
       database <- self$resolve_database(database)
-      key <- database # later database:instance
+      instance <- self$resolve_instance(database, instance)
+      key <- paste(database, instance, sep = ":")
       if (is.null(private$connections[[key]])) {
         cfg <- self$config[[database]]
         stopifnot(!is.null(cfg))
         driver <- getExportedValue(cfg$driver[[1L]], cfg$driver[[2L]])
+        args <- cfg$instances[[instance]]
+        stopifnot(!is.null(args))
         private$connections[[key]] <-
-          do.call(DBI::dbConnect, c(list(driver()), cfg$args))
+          do.call(DBI::dbConnect, c(list(driver()), args))
       }
       list(database = database,
+           instance = instance,
            connection = private$connections[[key]])
     },
 
@@ -40,6 +44,16 @@ connections <- R6::R6Class(
       database
     },
 
+    resolve_instance = function(database, instance) {
+      cfg <- self$config[[database]]
+      if (is.null(instance)) {
+        instance <- cfg$default_instance
+      } else {
+        match_value(instance, names(cfg$instances))
+      }
+      instance
+    },
+
     close_all = function() {
       for (con in private$connections) {
         DBI::dbDisconnect(con)
@@ -49,8 +63,8 @@ connections <- R6::R6Class(
   ))
 
 
-open_connection <- function(path, config, env, database) {
-  connections <- local_connections(path, config, env)$open(database)
+open_connection <- function(path, config, env, database, instance) {
+  connections <- local_connections(path, config, env)$open(database, instance)
 }
 
 

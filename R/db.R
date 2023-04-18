@@ -10,11 +10,11 @@
 ##'
 ##' @return Undefined
 ##' @export
-orderly_db_view <- function(query, as, database = NULL) {
+orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
   ctx <- orderly3::orderly_plugin_context("orderly3.db")
   query <- check_query(query, ctx)
-  con <- open_connection(ctx$path, ctx$config, ctx$env, database)
+  con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   sql <- sprintf("CREATE TEMPORARY VIEW %s AS\n%s", as, query)
   DBI::dbExecute(con$connection, sql)
   info <- list(database = con$database, as = as, query = query)
@@ -35,12 +35,16 @@ orderly_db_view <- function(query, as, database = NULL) {
 ##'   `NULL`) where you only have a single database, but must be
 ##'   specified if you have more than one database configured.
 ##'
+##' @param instance The instance of the database (within a given
+##'   `database`). This can be omitted (or `NULL`) where you have not
+##'   used instances or where you have only one configured.
+##'
 ##' @return Undefined
 ##' @export
-orderly_db_query <- function(query, as, database = NULL) {
+orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
   ctx <- orderly3::orderly_plugin_context("orderly3.db")
-  con <- open_connection(ctx$path, ctx$config, ctx$env, database)
+  con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   query <- check_query(query, ctx)
   d <- DBI::dbGetQuery(con$connection, query)
   ctx$env[[as]] <- d
@@ -61,10 +65,10 @@ orderly_db_query <- function(query, as, database = NULL) {
 ##'
 ##' @return Undefined
 ##' @export
-orderly_db_connection <- function(as, database = NULL) {
+orderly_db_connection <- function(as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
   ctx <- orderly3::orderly_plugin_context("orderly3.db")
-  con <- open_connection(ctx$path, ctx$config, ctx$env, database)
+  con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   ctx$env[[as]] <- con$connection
   info <- list(database = con$database, as = as)
   orderly3::orderly_plugin_add_metadata("orderly3.db", "connection", info)

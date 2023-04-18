@@ -89,7 +89,7 @@ test_that("validate plugin configuration", {
     "must contain at least one database")
   expect_error(
     orderly_db_config(list(db = list()), "orderly_config.yml"),
-    "Fields missing from orderly_config.yml:orderly3.db:db: driver, args")
+    "Fields missing from orderly_config.yml:orderly3.db:db: driver")
   expect_error(
     orderly_db_config(list(db = list(driver = NULL, args = NULL)),
                       "orderly_config.yml"),
@@ -109,24 +109,22 @@ test_that("validate plugin configuration", {
     orderly_db_config(
       list(db = list(driver = "pkg::db", args = list(a = 1))),
       "orderly_config.yml"),
-    list(db = list(driver = c("pkg", "db"), args = list(a = 1))))
+    list(db = list(driver = c("pkg", "db"),
+                   args = list(a = 1),
+                   instances = list(default = list(a = 1)),
+                   default_instance = "default")))
 })
 
 
 test_that("validate db for sqlite", {
-  expect_error(
-    orderly_db_config(
-      list(db = list(driver = "RSQLite::SQLite",
-                     args = list(dbname = ":memory:"))),
-      "orderly_config.yml"),
-    "Can't use an in-memory database with orderly3.db")
-
   db <- tempfile(tmpdir = normalizePath(tempdir(), mustWork = TRUE))
   ## Tweak so that things behave sensibly on windows:
   db <- gsub("\\", "/", db, fixed = TRUE)
 
   expected <- list(db = list(driver = c("RSQLite", "SQLite"),
-                             args = list(dbname = db)))
+                             args = list(dbname = db),
+                             instances = list(default = list(dbname = db)),
+                             default_instance = "default"))
 
   expect_equal(
     orderly_db_config(
@@ -208,4 +206,18 @@ test_that("can read a query from a file", {
   meta_db <- meta$custom$orderly$plugins$orderly3.db
   expect_equal(meta_db$query[[1]]$query,
                readLines(file.path(root, "src", "query", "query.sql")))
+})
+
+
+test_that("can run a report with instances", {
+  root <- test_prepare_example("instance",
+                               list(main = list(mtcars = mtcars_db[1:10, ]),
+                                    dev = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("instance", root = root, envir = env)
+
+  d1 <- readRDS(file.path(root, "archive", "instance", id, "data1.rds"))
+  d2 <- readRDS(file.path(root, "archive", "instance", id, "data2.rds"))
+  expect_equal(d1, mtcars_db[1:10, ])
+  expect_equal(d2, mtcars_db)
 })
