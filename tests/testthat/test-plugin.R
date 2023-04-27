@@ -221,3 +221,22 @@ test_that("can run a report with instances", {
   expect_equal(d1, mtcars_db[1:10, ])
   expect_equal(d2, mtcars_db)
 })
+
+
+test_that("can interpolate parameters into query", {
+  root <- test_prepare_example("interpolate",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("interpolate", list(mpg_min = 30),
+                              root = root, envir = env)
+  d <- readRDS(file.path(root, "archive", "interpolate", id, "data.rds"))
+  cmp <- mtcars_db[mtcars_db$mpg > 30, ]
+  rownames(cmp) <- NULL
+  expect_equal(d, cmp)
+
+  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_equal(
+    meta_db$query[[1]]$query,
+    sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
+})

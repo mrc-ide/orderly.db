@@ -82,5 +82,6 @@ check_query <- function(query, context) {
     ## this too, but that needs to wait for strict mode really.
     query <- readLines(file.path(context$src, query))
   }
+  query <- sql_str_sub(query, context$parameters)
   query
 }
