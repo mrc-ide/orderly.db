@@ -1,0 +1,9 @@
+CMD
+RPostgres
+SQLite
+VIMC
+codecov
+db
+etc
+io
+plugins

@@ -21,5 +21,5 @@ used instances or where you have only one configured.}
 Undefined
 }
 \description{
-Create a persistant connection object to the database
+Create a persistent connection object to the database
 }
