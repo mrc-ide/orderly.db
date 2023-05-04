@@ -24,6 +24,10 @@ Suggests:
     RSQLite,
     mockery,
     testthat (>= 3.0.0),
-    withr
+    withr,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 Remotes: mrc-ide/orderly3@plugin
+VignetteBuilder: knitr
+Language: en-GB

@@ -55,7 +55,7 @@ orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
 }
 
 
-##' Create a persistant connection object to the database
+##' Create a persistent connection object to the database
 ##'
 ##' @title Create connection to database
 ##'

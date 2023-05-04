@@ -1,0 +1,238 @@
+---
+title: "Introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `orderly3.db` package is an `orderly3` plugin which provides support for interacting with databases. It includes all core features that `orderly` (version 1) supported, but with the new syntax.
+
+This documentation is based off the original orderly vignette. There is a section at the end of the vignette with some comparisons of old and new syntaxes.
+
+## Configuration
+
+The root `orderly_config.yml` configuration specifies the locations of databases (there can be any number), within the plugins section. For example,
+
+```yaml
+plugins:
+  orderly3.db:
+    source:
+      driver: RPostgres::Postgres
+      args:
+        host: dbhost.example.org
+        port: 5432
+        user: myusername
+        password: s3cret
+        dbname: mydb
+```
+
+This database will be referred to elsewhere as `source` and it will be connected with the `RPostgres::Postgres` driver (from the [RPostgres](https://cran.r-project.org/package=RPostgres) package).  Arguments within the `args` block will be passed to the driver, in this case being the equivalent of:
+
+```r
+DBI::dbConnect(RPostgres::Postgres, host = "dbhost.example.org", port = 5432,
+               user = "myusername", password = "s3cret", dbname = "mydb")
+```
+
+The values used in the `args` blocks can be environment values (e.g., `password: $DB_PASSWORD`) in which case they will be resolved from the environment before connecting (including from `orderly_envir.yml`).  This will be useful for keeping secrets out of source control.
+
+For [SQLite](https://cran.r-project.org/package=RSQLite) databases, the `args` block will typically contain only `dbname` which is the path to the database file.
+
+## Use within a report
+
+Within a report's `orderly.R` file, you can extract data from the database as:
+
+```r
+orderly3.db::orderly_db_data(as = "cars", database = "source",
+                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+```
+
+In this case, the query `SELECT * FROM mtcars WHERE cyl = 4` will be run against the `source` database to create an object `cars` in the report environment.  The actual report code can use that object without having ever created the database connection or evaluating the query.
+
+You can establish temporary views in the database in order to simplify queries. For example, you might write:
+
+```r
+orderly3.db::orderly_db_view(as = "cars4", database = "source",
+                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+orderly3.db::orderly_db_data(as = "cars", database = "source",
+                             query = "SELECT * FROM cars4")
+```
+
+Here, we establish a view called `cars4` within the database; this is scoped to the current connection (`orderly3.db` ensures that the same connection is used for all calls to the database within a report run). Then we query against that view to pull the data down as the `cars` R object. In a real case this view could be more complicated, involving joins with other tables.
+
+
+If you need to perform complicated SQL queries, then you can export the database connection directly by writing
+
+```r
+orderly3.db::orderly_db_connection(as = "con", database = "source")
+```
+
+which will save the connection to the `source` database as the R object `con`.  We have used this where a report requires running queries in a loop that depend on the results of a previous query or additional data loaded into a report. Note that this reduces the amount of tracking that `orderly` can do, as we have no way of knowing what is done with the connection once passed to the script.
+
+## More on configuration
+
+### Environment variables for passwords
+
+The contents of `orderly_config.yml` may contain things like secrets
+(passwords) or hostnames that vary depending on deployment (e.g.,
+testing locally vs running on a remote system).  To customise this,
+you can use environment variables within the configuration.  So
+rather than writing
+
+```yaml
+plugins:
+  orderly3.db:
+    source:
+      driver: RPostgres::Postgres
+      args:
+        host: localhost
+        port: 5432
+        user: myuser
+        dbname: databasename
+        password: p4ssw0rd
+```
+
+you might write
+
+```yaml
+plugins:
+  orderly3.db:
+    source:
+      driver: RPostgres::Postgres
+      args:
+        host: $MY_DBHOST
+        port: $MY_DBPORT
+        user: $MY_DBUSER
+        dbname: $MY_DBNAME
+        password: $MY_PASSWORD
+```
+
+environment variables, as used this way **must** begin with a
+dollar sign and consist only of uppercase letters, numbers and the
+underscore character.  You can then set the environment variables
+in an `.Renviron` (either within the project or in your home
+directory) file or your `.profile` file.  Alternatively, you can
+create a file `orderly_envir.yml` in the same directory as
+`orderly_config.yml` with key-value pairs, such as
+
+```yaml
+MY_DBHOST: localhost
+MY_DBPORT: 5432
+MY_DBUSER: myuser
+MY_DBNAME: databasename
+MY_PASSWORD: p4ssw0rd
+```
+
+This is read every time that `orderly_config.yml` is read (in
+contrast with `.Renviron` which is read-only at the start of a
+session).  This will likely be more pleasant to work with.
+
+The advantage of using environment variables is that you can add the
+`orderly_envir.yml` file to your `.gitignore` and avoid committing
+system-dependent data to the central repository.
+
+### Advanced database configuration
+
+_In general, you can ignore this section if you only use one global database._
+
+The above approach can be used to switch databases by using different environmental variables, but that can become tiresome.  If you have multiple database "instances" corresponding to different realisations of the same logical database (e.g., production and staging), then you can configure and switch between these directly from `orderly` commands.  At [VIMC](https://www.vaccineimpact.org) we have several copies of our main database: one called `production`, which is the canonical copy, and then several `staging` copies that we use for experimentation.
+
+To configure this situation, list common arguments within the `args` block as before, then add logical databases as named entries in an `instances` field:
+
+```
+plugins:
+  orderly3.db:
+    source:
+      driver: RPostgres::Postgres
+      args:
+        port: 5432
+        user: user
+        dbname: mydb
+      instances:
+        production:
+          host: production.example.org
+          password: $PASSWORD_PRODUCTION
+        staging:
+          host: staging.example.org
+          password: $PASSWORD_STAGING
+      default_instance: $DEFAULT_INSTANCE
+```
+
+Here - staging and production have different hostnames (`production.example.org` and `staging.example.org`) and different passwords (retrieved using environment variables) and the default instance is set with another environment variable (`$DEFAULT_INSTANCE`, which must be one of `production` or `staging`).  To switch between databases, you can set that variable, or pass the `instance` argument to `orderly3.db::orderly_db_data` and friends, as:
+
+```r
+orderly3.db::orderly_db_data(as = "cars", database = "source", query = query,
+                             instance = "production")
+```
+
+or
+
+```r
+orderly3.db::orderly_db_data(as = "cars", database = "source", query = query,
+                             instance = "staging")
+```
+
+If you pass a value of `NULL` for `instance`, then we fall back on the default instance (and if none is specified, throw an error).  You might like to make this a parameter to your report to allow changing the instance dynamically when running.
+
+## Migrating from orderly v1
+
+Querying for data
+
+```yaml
+data:
+  cars:
+    query: SELECT * FROM mtcars WHERE cyl = 4
+    database: source
+```
+
+becomes
+
+
+```r
+orderly3.db::orderly_db_data(as = "cars", database = "source",
+                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+```
+
+Establishing views
+
+```yaml
+views:
+  cars4:
+    query: SELECT * FROM mtcars WHERE cyl = 4
+    database: source
+```
+
+becomes
+
+
+```r
+orderly3.db::orderly_db_view(as = "cars4", database = "source",
+                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+```
+
+Exporting connections
+
+```yaml
+connection:
+  con: source
+```
+
+becomes
+
+```r
+orderly3.db::orderly_db_connection(as = "con", database = "source")
+```
+
+### Other differences in behaviour
+
+In `orderly` v1, we saved a copy of the captured data within `orderly`'s `data/` directory with the idea that this would help with future reproducibility, however in practice this did not prove useful.  We do store some basic metrics within the packet metadata about the extraction (number of rows fetched, names of the columns etc), which can be used to track what was extracted, or at least monitor for changes between different versions.
+
+The control over different database instances used to be a top-level argument to `orderly_run`, but now that the database is no longer a core part of orderly that is not possible.  Instead, instance is just something that is passed through to the `orderly3.db::orderly_db_*` calls, and can be derived from any variable you fancy. You can then configure its behaviour from an orderly parameter, or from environment variables, or via some other mechanism.
