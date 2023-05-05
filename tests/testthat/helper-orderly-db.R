@@ -4,7 +4,7 @@ rownames(mtcars_db) <- NULL
 test_prepare_example <- function(examples, data) {
   tmp <- tempfile()
   withr::defer_parent(unlink(tmp, recursive = TRUE))
-  orderly3:::orderly_init(tmp)
+  orderly3:::orderly_init(tmp, logging_console = FALSE)
 
   if (identical(examples, "instance")) {
     fmt <- paste(

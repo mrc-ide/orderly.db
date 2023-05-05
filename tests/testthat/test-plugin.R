@@ -6,7 +6,7 @@ test_that("basic plugin use works", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "minimal", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -34,7 +34,7 @@ test_that("allow connection", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connection", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -69,7 +69,7 @@ test_that("allow connection without data", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connectiononly", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -183,7 +183,7 @@ test_that("can construct a view, then read from it", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "view", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db[c("mpg", "cyl")])
 
