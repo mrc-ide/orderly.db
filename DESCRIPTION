@@ -28,6 +28,6 @@ Suggests:
     knitr,
     rmarkdown
 Config/testthat/edition: 3
-Remotes: mrc-ide/orderly3
+Remotes: mrc-ide/orderly3@outpack-0-3-0
 VignetteBuilder: knitr
 Language: en-GB
