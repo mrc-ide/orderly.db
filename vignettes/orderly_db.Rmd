@@ -57,6 +57,16 @@ orderly3.db::orderly_db_data(as = "cars", database = "source",
 
 In this case, the query `SELECT * FROM mtcars WHERE cyl = 4` will be run against the `source` database to create an object `cars` in the report environment.  The actual report code can use that object without having ever created the database connection or evaluating the query.
 
+You can interpolate parameters into the query; for example you might have:
+
+```r
+orderly3::orderly_parameter(cyl = NULL)
+orderly3.db::orderly_db_data(as = "cars", database = "source",
+                             query = "SELECT * FROM mtcars WHERE cyl = ?cyl")
+```
+
+In the above, we declare an orderly parameter `cyl` with no default (see `?orderly3::orderly_parameter`) and use `?cyl` to interpolate that into the query (see `?DBI::sqlInterpolate` which does the interpolation for us). You can only use orderly varibles for this; if you need more complex substitution you can create strings using `paste` or `sprintf` as suits your needs.
+
 You can establish temporary views in the database in order to simplify queries. For example, you might write:
 
 ```r
