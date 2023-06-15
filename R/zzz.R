@@ -1,3 +1,12 @@
 .onLoad <- function(...) {
-  orderly2::orderly_plugin_register(orderly_db_plugin(), "orderly2.db") # nocov
+  # nocov start
+  schema <- system.file("orderly.db.json", package = "orderly3.db",
+                        mustWork = TRUE)
+  orderly3::orderly_plugin_register(
+    "orderly3.db",
+    config = orderly_db_config,
+    serialise = orderly_db_serialise,
+    cleanup  = orderly_db_cleanup ,
+    schema = schema)
+  # nocov end
 }

@@ -1,4 +1,4 @@
 library(testthat)
-library(orderly2.db)
+library(orderly3.db)
 
-test_check("orderly2.db")
+test_check("orderly3.db")

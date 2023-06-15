@@ -1,119 +1,130 @@
 test_that("basic plugin use works", {
-  root <- test_prepare_example("minimal", list(mtcars = mtcars))
+  root <- test_prepare_example("minimal",
+                               list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("minimal", root = root, envir = env)
+  id <- orderly3::orderly_run("minimal", root = root, envir = env)
   expect_type(id, "character")
 
-  expect_true(file.exists(
-    file.path(root, "archive", "minimal", id, "mygraph.png")))
+  path <- file.path(root, "archive", "minimal", id)
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_equal(readRDS(file.path(path, "data.rds")),
+               mtcars_db)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
-  expect_setequal(names(meta_db), c("data", "connection"))
-  expect_setequal(names(meta_db$data), "dat1")
-  expect_setequal(names(meta_db$data$dat1), c("rows", "cols"))
-  expect_equal(meta_db$data$dat1$rows, nrow(mtcars))
-  expect_equal(meta_db$data$dat1$cols, as.list(names(mtcars)))
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_equal(names(meta_db), "query")
 
-  expect_length(meta_db$connection, 0)
+  expect_length(meta_db$query, 1)
+  expect_setequal(names(meta_db$query[[1]]),
+                  c("as", "database", "query", "rows", "cols"))
+  expect_equal(meta_db$query[[1]]$as, "dat1")
+  expect_equal(meta_db$query[[1]]$database, "source")
+  expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
+  expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
+  expect_equal(meta_db$query[[1]]$query, "SELECT * FROM mtcars")
 })
 
 
 test_that("allow connection", {
-  root <- test_prepare_example("connection", list(mtcars = mtcars))
+  root <- test_prepare_example("connection",
+                               list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("connection", root = root, envir = env)
+  id <- orderly3::orderly_run("connection", root = root, envir = env)
 
   expect_type(id, "character")
 
-  expect_true(file.exists(
-    file.path(root, "archive", "connection", id, "mygraph.png")))
+  path <- file.path(root, "archive", "connection", id)
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_equal(readRDS(file.path(path, "data.rds")),
+               mtcars_db)
 
-  ## Save a copy of the connection out:
-  con <- env$con1
-  expect_s4_class(con, "SQLiteConnection")
-  expect_true(DBI::dbIsValid(con))
-  expect_equal(DBI::dbListTables(con), "mtcars") # still works
-
-  ## Force cleanup, check it closes connection:
-  rm(env)
-  gc()
-  expect_false(DBI::dbIsValid(con))
+  ## Connection should now have been invalidated:
+  expect_false(DBI::dbIsValid(env$con))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
-  expect_setequal(names(meta_db), c("data", "connection"))
-  expect_setequal(names(meta_db$data), "dat1")
-  expect_setequal(names(meta_db$data$dat1), c("rows", "cols"))
-  expect_equal(meta_db$data$dat1$rows, nrow(mtcars))
-  expect_equal(meta_db$data$dat1$cols, as.list(names(mtcars)))
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_setequal(names(meta_db), c("query", "connection"))
 
-  expect_equal(meta_db$connection, list(con1 = "source"))
+  expect_length(meta_db$query, 1)
+  expect_setequal(names(meta_db$query[[1]]),
+                  c("as", "database", "query", "rows", "cols"))
+  expect_equal(meta_db$query[[1]]$as, "dat")
+  expect_equal(meta_db$query[[1]]$database, "source")
+  expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
+  expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
+  expect_equal(meta_db$query[[1]]$query, "SELECT * FROM mtcars")
+
+  expect_length(meta_db$connection, 1)
+  expect_mapequal(meta_db$connection[[1]],
+                  list(database = "source", as = "con"))
 })
 
 
 test_that("allow connection without data", {
-  root <- test_prepare_example("connectiononly", list(mtcars = mtcars))
+  root <- test_prepare_example("connectiononly",
+                               list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("connectiononly", root = root, envir = env)
+  id <- orderly3::orderly_run("connectiononly", root = root, envir = env)
 
   expect_type(id, "character")
 
-  expect_true(file.exists(
-    file.path(root, "archive", "connectiononly", id, "mygraph.png")))
+  path <- file.path(root, "archive", "connectiononly", id)
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_equal(readRDS(file.path(path, "data.rds")),
+               mtcars_db)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly2.db
-  expect_setequal(names(meta_db), c("data", "connection"))
-  expect_equal(meta_db$data, list())
-  expect_equal(meta_db$connection, list(con1 = "source"))
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_setequal(names(meta_db), "connection")
+
+  expect_length(meta_db$connection, 1)
+  expect_mapequal(meta_db$connection[[1]],
+                  list(database = "source", as = "con"))
 })
 
 
 test_that("validate plugin configuration", {
   expect_error(
     orderly_db_config(list(), "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db' must be named")
+    "must contain at least one database")
   expect_error(
     orderly_db_config(list(db = list()), "orderly_config.yml"),
-    "Fields missing from orderly_config.yml:orderly2.db:db: driver, args")
+    "Fields missing from orderly_config.yml:orderly3.db:db: driver")
   expect_error(
     orderly_db_config(list(db = list(driver = NULL, args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db:db:driver' must be a scalar")
+    "'orderly_config.yml:orderly3.db:db:driver' must be a scalar")
   expect_error(
     orderly_db_config(list(db = list(driver = "db", args = NULL)),
                       "orderly_config.yml"),
     paste("Expected fully qualified name for",
-          "orderly_config.yml:orderly2.db:db:driver"))
+          "orderly_config.yml:orderly3.db:db:driver"))
   expect_error(
     orderly_db_config(list(db = list(driver = "pkg::db", args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly2.db:db:args' must be named")
+    "'orderly_config.yml:orderly3.db:db:args' must be named")
 
   ## Success:
   expect_equal(
     orderly_db_config(
       list(db = list(driver = "pkg::db", args = list(a = 1))),
       "orderly_config.yml"),
-    list(db = list(driver = c("pkg", "db"), args = list(a = 1))))
+    list(db = list(driver = c("pkg", "db"),
+                   args = list(a = 1),
+                   instances = list(default = list(a = 1)),
+                   default_instance = "default")))
 })
 
 
 test_that("validate db for sqlite", {
-  expect_error(
-    orderly_db_config(
-      list(db = list(driver = "RSQLite::SQLite",
-                     args = list(dbname = ":memory:"))),
-      "orderly_config.yml"),
-    "Can't use an in-memory database with orderly2.db")
-
   db <- tempfile(tmpdir = normalizePath(tempdir(), mustWork = TRUE))
   ## Tweak so that things behave sensibly on windows:
   db <- gsub("\\", "/", db, fixed = TRUE)
 
   expected <- list(db = list(driver = c("RSQLite", "SQLite"),
-                             args = list(dbname = db)))
+                             args = list(dbname = db),
+                             instances = list(default = list(dbname = db)),
+                             default_instance = "default"))
 
   expect_equal(
     orderly_db_config(
@@ -132,171 +143,49 @@ test_that("validate db for sqlite", {
 })
 
 
-test_that("validate orderly.yml read", {
-  mock_root <- list(config = list(orderly2.db = list(db = list())))
+test_that("must be specific if more than one db present", {
+  root <- test_prepare_example("minimal",
+                               list(source = list(mtcars = mtcars_db),
+                                    other = list(iris = iris)))
+  env <- new.env()
   expect_error(
-    orderly_db_read(list(1), "orderly.yml", mock_root),
-    "'orderly.yml:orderly2.db' must be named")
-  expect_error(
-    orderly_db_read(list(data = list(a = TRUE)), "orderly.yml", mock_root),
-    "Fields missing from orderly.yml:orderly2.db:data:a: query")
-  expect_error(
-    orderly_db_read(
-      list(data = list(a = list(query = TRUE, database = "other"))),
-      "orderly.yml", mock_root),
-    "orderly.yml:orderly2.db:data:a:database must be one of 'db'")
-  expect_error(
-    orderly_db_read(
-      list(data = list(a = list(query = TRUE, database = "db"))),
-      "orderly.yml", mock_root),
-    "'orderly.yml:orderly2.db:data:a:query' must be character")
+    orderly3::orderly_run("minimal", root = root, envir = env),
+    "'database' must be given if there is more than one database")
 
-  expect_equal(
-    orderly_db_read(
-      list(data = list(a = list(query = "SELECT *", database = "db"))),
-      "orderly.yml", mock_root),
-    list(data = list(a = list(query = "SELECT *", database = "db"))))
-  expect_equal(
-    orderly_db_read(
-      list(data = list(a = list(query = c("SELECT", "*"), database = "db"))),
-      "orderly.yml", mock_root),
-    list(data = list(a = list(query = "SELECT\n*", database = "db"))))
+  path_code <- file.path(root, "src", "minimal", "orderly.R")
+  code <- readLines(path_code)
+  code <- sub("orderly3.db::orderly_db_query(",
+              'orderly3.db::orderly_db_query(database = "source",',
+              code, fixed = TRUE)
+  writeLines(code, path_code)
 
-  tmp <- tempfile()
-  on.exit(unlink(tmp))
-  writeLines(c("SELECT", "*"), tmp)
+  id <- orderly3::orderly_run("minimal", root = root, envir = env)
   expect_equal(
-    orderly_db_read(
-      list(data = list(a = list(query = tmp, database = "db"))),
-      "orderly.yml", mock_root),
-    list(data = list(a = list(query = "SELECT\n*", database = "db"))))
+    readRDS(file.path(root, "archive", "minimal", id, "data.rds")),
+    mtcars_db)
 })
 
 
-test_that("fall back on default db if not specified", {
-  mock_root <- list(config = list(orderly2.db = list(db = list())))
-  expect_equal(
-    orderly_db_read(
-      list(data = list(a = list(query = "SELECT *"))),
-      "orderly.yml", mock_root),
-    list(data = list(a = list(query = "SELECT *", database = "db"))))
-})
-
-
-test_that("error if db not specified and more than one db possible", {
-  mock_root <- list(config = list(
-                      orderly2.db = list(db1 = list(), db2 = list())))
+test_that("sensible error if no databases configured", {
+  root <- test_prepare_example("minimal", list())
   expect_error(
-    orderly_db_read(
-      list(data = list(a = list(query = "SELECT *"))),
-      "orderly.yml", mock_root),
-    paste("More than one database configured ('db1', 'db2');",
-          "a 'database' field is required for 'orderly.yml:orderly2.db:data:a"),
+    orderly3::orderly_run("minimal", root = root, envir = env),
+    "orderly_config.yml:orderly3.db must contain at least one database",
     fixed = TRUE)
 })
 
 
-test_that("validate read connection", {
-  mock_root <- list(config = list(orderly2.db = list(db = list())))
-  expect_equal(
-    orderly_db_read(
-      list(connection = list(a = "db")),
-      "orderly.yml", mock_root),
-    list(connection = list(a = "db")))
-  expect_error(
-    orderly_db_read(
-      list(connection = list(a = "missing")),
-      "orderly.yml", mock_root),
-    "orderly.yml:orderly2.db:connection:a must be one of 'db'")
-  expect_error(
-    orderly_db_read(
-      list(connection = list(a = TRUE)),
-      "orderly.yml", mock_root),
-    "'orderly.yml:orderly2.db:connection:a' must be character")
-})
-
-
-test_that("require either connection or data", {
-  mock_root <- list(config = list(orderly2.db = list(db = list())))
-  expect_error(
-    orderly_db_read(list(), "orderly.yml", mock_root),
-    "At least one of 'data' or 'views' or 'connection' must be given")
-})
-
-
-test_that("pull data from run function", {
-  cars <- cbind(name = rownames(mtcars), mtcars)
-  rownames(cars) <- NULL
-  path <- test_prepare_example("minimal", list(cars = cars))
-
-  root <- orderly2:::orderly_root(path, FALSE)
-  data <- list(data = list(a = list(query = "SELECT * from cars",
-                                    database = "source")))
-  tmp <- tempfile()
-  env <- new.env(parent = topenv())
-  meta <- orderly_db_run(data, root, list(), env, tmp)
-  expect_equal(ls(env), "a")
-  expect_equal(env$a, cars)
-
-  expect_s3_class(meta, "json")
-  expect_mapequal(
-    jsonlite::fromJSON(meta),
-    list(data = list(a = list(rows = nrow(cars), cols = names(cars))),
-         connection = list()))
-})
-
-
-test_that("run function cleans up connections", {
-  skip_if_not_installed("mockery")
-
-  cars <- cbind(name = rownames(mtcars), mtcars)
-  rownames(cars) <- NULL
-  path <- test_prepare_example("minimal", list(cars = cars))
-
-  con <- new.env() # just gives us a singleton
-  mock_connect <- mockery::mock(con)
-  mock_query <- mockery::mock(cars)
-  mock_disconnect <- mockery::mock()
-  mockery::stub(orderly_db_run, "orderly_db_connect", mock_connect)
-  mockery::stub(orderly_db_run, "DBI::dbGetQuery", mock_query)
-  mockery::stub(orderly_db_run, "orderly_db_disconnect", mock_disconnect)
-
-  root <- orderly2:::orderly_root(path, FALSE)
-  data <- list(data = list(a = list(query = "SELECT * from cars",
-                                    database = "source")))
-  tmp <- tempfile()
-  env <- new.env(parent = topenv())
-  meta <- orderly_db_run(data, root, list(), env, tmp)
-  expect_equal(ls(env), "a")
-  expect_equal(env$a, cars)
-
-  mockery::expect_called(mock_connect, 1)
-  expect_equal(mockery::mock_args(mock_connect)[[1]],
-               list("source", root$config$orderly2.db))
-
-  mockery::expect_called(mock_query, 1)
-  expect_identical(mockery::mock_args(mock_query)[[1]][[1]], con)
-  expect_equal(mockery::mock_args(mock_query)[[1]][[2]], "SELECT * from cars")
-
-  mockery::expect_called(mock_disconnect, 1)
-  expect_equal(mockery::mock_args(mock_disconnect)[[1]],
-               list(list(source = con)))
-})
-
-
-test_that("can construct plugin", {
-  expect_identical(orderly_db_plugin(),
-                   orderly2:::.plugins$orderly2.db)
-})
-
-
 test_that("can construct a view, then read from it", {
-  root <- test_prepare_example("view", list(mtcars = mtcars))
+  root <- test_prepare_example("view", list(source = list(mtcars = mtcars_db)))
+
   env <- new.env()
-  id <- orderly2::orderly_run("view", root = root, envir = env)
+  id <- orderly3::orderly_run("view", root = root, envir = env)
   expect_type(id, "character")
-  expect_true(file.exists(
-    file.path(root, "archive", "view", id, "mygraph.png")))
+
+  path <- file.path(root, "archive", "view", id)
+  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_equal(readRDS(file.path(path, "data.rds")),
+               mtcars_db[c("mpg", "cyl")])
 
   path_db <- file.path(root, "source.sqlite")
   withr::with_db_connection(
@@ -304,4 +193,50 @@ test_that("can construct a view, then read from it", {
     ## View not present here, it was only available to the client that
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
+})
+
+
+test_that("can read a query from a file", {
+  root <- test_prepare_example("query",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("query", root = root, envir = env)
+
+  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_equal(meta_db$query[[1]]$query,
+               readLines(file.path(root, "src", "query", "query.sql")))
+})
+
+
+test_that("can run a report with instances", {
+  root <- test_prepare_example("instance",
+                               list(main = list(mtcars = mtcars_db[1:10, ]),
+                                    dev = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("instance", root = root, envir = env)
+
+  d1 <- readRDS(file.path(root, "archive", "instance", id, "data1.rds"))
+  d2 <- readRDS(file.path(root, "archive", "instance", id, "data2.rds"))
+  expect_equal(d1, mtcars_db[1:10, ])
+  expect_equal(d2, mtcars_db)
+})
+
+
+test_that("can interpolate parameters into query", {
+  root <- test_prepare_example("interpolate",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly3::orderly_run("interpolate", list(mpg_min = 30),
+                              root = root, envir = env)
+  d <- readRDS(file.path(root, "archive", "interpolate", id, "data.rds"))
+  cmp <- mtcars_db[mtcars_db$mpg > 30, ]
+  rownames(cmp) <- NULL
+  expect_equal(d, cmp)
+
+  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  expect_equal(
+    meta_db$query[[1]]$query,
+    sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
 })

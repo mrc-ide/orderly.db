@@ -6,11 +6,21 @@
     "type": "object",
     "properties": {
         "data": {
-            "additionalProperties": {
+            "type": "array",
+            "items": {
                 "type": "object",
                 "properties": {
+                    "database": {
+                        "type": "string"
+                    },
+                    "as": {
+                        "type": "string"
+                    },
+                    "query": {
+                        "type": "string"
+                    },
                     "rows": {
-                        "type": "number"
+                        "type": "integer"
                     },
                     "cols": {
                         "type": "array",
@@ -18,9 +28,46 @@
                             "type": "character"
                         }
                     }
-                }
+                },
+                "required": ["database", "as", "query", "rows", "cols"]
+                "additionalProperties": false
+            }
+        },
+        "view": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "type": "string"
+                    },
+                    "as": {
+                        "type": "string"
+                    },
+                    "query": {
+                        "type": "string"
+                    }
+                },
+                "required": ["database", "as", "query"]
+                "additionalProperties": false
+            }
+        },
+        "connection": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "database": {
+                        "type": "string"
+                    },
+                    "as": {
+                        "type": "string"
+                    }
+                },
+                "required": ["database", "as"]
+                "additionalProperties": false
             }
         }
     },
-    "required": ["data"]
+    "additionalProperties": false
 }
