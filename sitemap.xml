@@ -7,6 +7,12 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/orderly_db.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -14,5 +20,14 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/orderly_db_connection.html</loc>
+  </url>
+  <url>
+    <loc>/reference/orderly_db_query.html</loc>
+  </url>
+  <url>
+    <loc>/reference/orderly_db_view.html</loc>
   </url>
 </urlset>
