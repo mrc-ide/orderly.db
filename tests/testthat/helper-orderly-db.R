@@ -4,7 +4,9 @@ rownames(mtcars_db) <- NULL
 test_prepare_example <- function(examples, data) {
   tmp <- tempfile()
   withr::defer_parent(unlink(tmp, recursive = TRUE))
-  orderly3:::orderly_init(tmp, logging_console = FALSE)
+  orderly2:::orderly_init(tmp, logging_console = FALSE)
+
+  cfg_base <- "minimum_orderly_version: 1.99.0"
 
   if (identical(examples, "instance")) {
     fmt <- paste(
@@ -13,7 +15,7 @@ test_prepare_example <- function(examples, data) {
       sep = "\n")
     cfg <- c(
       "plugins:",
-      "  orderly3.db:",
+      "  orderly.db:",
       "    db:",
       "      driver: RSQLite::SQLite",
       "      args: ~",
@@ -28,10 +30,10 @@ test_prepare_example <- function(examples, data) {
       sep = "\n")
     cfg <- c(
       "plugins:",
-      "  orderly3.db:",
+      "  orderly.db:",
       sprintf(fmt, names(data), names(data)))
   }
-  writeLines(cfg, file.path(tmp, "orderly_config.yml"))
+  writeLines(c(cfg_base, cfg), file.path(tmp, "orderly_config.yml"))
 
   for (nm_db in names(data)) {
     con <- DBI::dbConnect(RSQLite::SQLite(),

@@ -2,7 +2,7 @@ test_that("basic plugin use works", {
   root <- test_prepare_example("minimal",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("minimal", root = root, envir = env)
+  id <- orderly2::orderly_run("minimal", root = root, envir = env)
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "minimal", id)
@@ -11,7 +11,7 @@ test_that("basic plugin use works", {
                mtcars_db)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(names(meta_db), "query")
 
   expect_length(meta_db$query, 1)
@@ -29,7 +29,7 @@ test_that("allow connection", {
   root <- test_prepare_example("connection",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("connection", root = root, envir = env)
+  id <- orderly2::orderly_run("connection", root = root, envir = env)
 
   expect_type(id, "character")
 
@@ -42,7 +42,7 @@ test_that("allow connection", {
   expect_false(DBI::dbIsValid(env$con))
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
   expect_length(meta_db$query, 1)
@@ -64,7 +64,7 @@ test_that("allow connection without data", {
   root <- test_prepare_example("connectiononly",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("connectiononly", root = root, envir = env)
+  id <- orderly2::orderly_run("connectiononly", root = root, envir = env)
 
   expect_type(id, "character")
 
@@ -74,7 +74,7 @@ test_that("allow connection without data", {
                mtcars_db)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_setequal(names(meta_db), "connection")
 
   expect_length(meta_db$connection, 1)
@@ -89,20 +89,20 @@ test_that("validate plugin configuration", {
     "must contain at least one database")
   expect_error(
     orderly_db_config(list(db = list()), "orderly_config.yml"),
-    "Fields missing from orderly_config.yml:orderly3.db:db: driver")
+    "Fields missing from orderly_config.yml:orderly.db:db: driver")
   expect_error(
     orderly_db_config(list(db = list(driver = NULL, args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly3.db:db:driver' must be a scalar")
+    "'orderly_config.yml:orderly.db:db:driver' must be a scalar")
   expect_error(
     orderly_db_config(list(db = list(driver = "db", args = NULL)),
                       "orderly_config.yml"),
     paste("Expected fully qualified name for",
-          "orderly_config.yml:orderly3.db:db:driver"))
+          "orderly_config.yml:orderly.db:db:driver"))
   expect_error(
     orderly_db_config(list(db = list(driver = "pkg::db", args = NULL)),
                       "orderly_config.yml"),
-    "'orderly_config.yml:orderly3.db:db:args' must be named")
+    "'orderly_config.yml:orderly.db:db:args' must be named")
 
   ## Success:
   expect_equal(
@@ -149,17 +149,17 @@ test_that("must be specific if more than one db present", {
                                     other = list(iris = iris)))
   env <- new.env()
   expect_error(
-    orderly3::orderly_run("minimal", root = root, envir = env),
+    orderly2::orderly_run("minimal", root = root, envir = env),
     "'database' must be given if there is more than one database")
 
   path_code <- file.path(root, "src", "minimal", "orderly.R")
   code <- readLines(path_code)
-  code <- sub("orderly3.db::orderly_db_query(",
-              'orderly3.db::orderly_db_query(database = "source",',
+  code <- sub("orderly.db::orderly_db_query(",
+              'orderly.db::orderly_db_query(database = "source",',
               code, fixed = TRUE)
   writeLines(code, path_code)
 
-  id <- orderly3::orderly_run("minimal", root = root, envir = env)
+  id <- orderly2::orderly_run("minimal", root = root, envir = env)
   expect_equal(
     readRDS(file.path(root, "archive", "minimal", id, "data.rds")),
     mtcars_db)
@@ -169,8 +169,8 @@ test_that("must be specific if more than one db present", {
 test_that("sensible error if no databases configured", {
   root <- test_prepare_example("minimal", list())
   expect_error(
-    orderly3::orderly_run("minimal", root = root, envir = env),
-    "orderly_config.yml:orderly3.db must contain at least one database",
+    orderly2::orderly_run("minimal", root = root, envir = env),
+    "orderly_config.yml:orderly.db must contain at least one database",
     fixed = TRUE)
 })
 
@@ -179,7 +179,7 @@ test_that("can construct a view, then read from it", {
   root <- test_prepare_example("view", list(source = list(mtcars = mtcars_db)))
 
   env <- new.env()
-  id <- orderly3::orderly_run("view", root = root, envir = env)
+  id <- orderly2::orderly_run("view", root = root, envir = env)
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "view", id)
@@ -200,10 +200,10 @@ test_that("can read a query from a file", {
   root <- test_prepare_example("query",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("query", root = root, envir = env)
+  id <- orderly2::orderly_run("query", root = root, envir = env)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(meta_db$query[[1]]$query,
                readLines(file.path(root, "src", "query", "query.sql")))
 })
@@ -214,7 +214,7 @@ test_that("can run a report with instances", {
                                list(main = list(mtcars = mtcars_db[1:10, ]),
                                     dev = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("instance", root = root, envir = env)
+  id <- orderly2::orderly_run("instance", root = root, envir = env)
 
   d1 <- readRDS(file.path(root, "archive", "instance", id, "data1.rds"))
   d2 <- readRDS(file.path(root, "archive", "instance", id, "data2.rds"))
@@ -227,7 +227,7 @@ test_that("can interpolate parameters into query", {
   root <- test_prepare_example("interpolate",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly3::orderly_run("interpolate", list(mpg_min = 30),
+  id <- orderly2::orderly_run("interpolate", list(mpg_min = 30),
                               root = root, envir = env)
   d <- readRDS(file.path(root, "archive", "interpolate", id, "data.rds"))
   cmp <- mtcars_db[mtcars_db$mpg > 30, ]
@@ -235,7 +235,7 @@ test_that("can interpolate parameters into query", {
   expect_equal(d, cmp)
 
   meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
-  meta_db <- meta$custom$orderly$plugins$orderly3.db
+  meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(
     meta_db$query[[1]]$query,
     sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
