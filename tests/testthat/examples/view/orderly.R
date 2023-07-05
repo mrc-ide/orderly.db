@@ -1,8 +1,8 @@
-orderly3::orderly_artefact("Some data", "data.rds")
-orderly3.db::orderly_db_view(
+orderly2::orderly_artefact("Some data", "data.rds")
+orderly.db::orderly_db_view(
   as = "thedata",
   query = "SELECT mpg, cyl FROM mtcars")
-orderly3.db::orderly_db_query(
+orderly.db::orderly_db_query(
   as = "dat",
   query = "SELECT * FROM thedata")
 

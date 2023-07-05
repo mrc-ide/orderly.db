@@ -1,4 +1,4 @@
-orderly3.db::orderly_db_query(query = "query.sql", as = "dat1")
-orderly3::orderly_artefact("Some data", "data.rds")
+orderly.db::orderly_db_query(query = "query.sql", as = "dat1")
+orderly2::orderly_artefact("Some data", "data.rds")
 
 saveRDS(dat1, "data.rds")

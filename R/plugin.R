@@ -1,11 +1,11 @@
 orderly_db_config <- function(data, filename) {
   if (length(data) == 0) {
-    stop(sprintf("%s:orderly3.db must contain at least one database", filename))
+    stop(sprintf("%s:orderly.db must contain at least one database", filename))
   }
-  assert_named(data, unique = TRUE, name = sprintf("%s:orderly3.db", filename))
+  assert_named(data, unique = TRUE, name = sprintf("%s:orderly.db", filename))
   for (nm in names(data)) {
     db <- data[[nm]]
-    prefix <- sprintf("%s:orderly3.db:%s", filename, nm)
+    prefix <- sprintf("%s:orderly.db:%s", filename, nm)
     optional <- c("args", "instances", "default_instance")
     check_fields(db, prefix, "driver", optional)
     driver <- check_symbol_from_str(db$driver, paste0(prefix, ":driver"))
@@ -61,7 +61,7 @@ orderly_db_serialise <- function(data) {
 
 
 orderly_db_cleanup <- function() {
-  ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  ctx <- orderly2::orderly_plugin_context("orderly.db")
   local_connections_close(ctx$path)
 }
 

@@ -1,11 +1,11 @@
-Package: orderly3.db
-Title: Database Support for 'orderly3'
+Package: orderly.db
+Title: Database Support for 'orderly2'
 Version: 0.1.1
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
                     email = "rich.fitzjohn@gmail.com"),
              person("Imperial College of Science, Technology and Medicine",
                     role = "cph"))
-Description: Access databases from 'orderly3' while running reports.
+Description: Access databases from 'orderly2' while running reports.
     Includes the basic 'SQL' support originally included in 'orderly'
     for establishing connections and setting up data for use within a
     report.
@@ -13,21 +13,21 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
-URL: https://github.com/vimc/orderly3.db
-BugReports: https://github.com/vimc/orderly3.db/issues
+URL: https://github.com/vimc/orderly.db
+BugReports: https://github.com/vimc/orderly.db/issues
 Imports:
     DBI,
     fs,
     jsonlite,
-    orderly3
+    orderly2 (>= 1.99.0)
 Suggests:
     RSQLite,
-    mockery,
-    testthat (>= 3.0.0),
-    withr,
     knitr,
-    rmarkdown
+    mockery,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
 Config/testthat/edition: 3
-Remotes: mrc-ide/orderly3
+Remotes: mrc-ide/orderly2
 VignetteBuilder: knitr
 Language: en-GB

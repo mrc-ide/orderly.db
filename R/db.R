@@ -12,13 +12,13 @@
 ##' @export
 orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
-  ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  ctx <- orderly2::orderly_plugin_context("orderly.db")
   query <- check_query(query, ctx)
   con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   sql <- sprintf("CREATE TEMPORARY VIEW %s AS\n%s", as, query)
   DBI::dbExecute(con$connection, sql)
   info <- list(database = con$database, as = as, query = query)
-  orderly3::orderly_plugin_add_metadata("orderly3.db", "view", info)
+  orderly2::orderly_plugin_add_metadata("orderly.db", "view", info)
   invisible()
 }
 
@@ -43,14 +43,14 @@ orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
 ##' @export
 orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
-  ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  ctx <- orderly2::orderly_plugin_context("orderly.db")
   con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   query <- check_query(query, ctx)
   d <- DBI::dbGetQuery(con$connection, query)
   ctx$env[[as]] <- d
   info <- list(database = con$database, as = as, query = query,
                rows = nrow(d), cols = names(d))
-  orderly3::orderly_plugin_add_metadata("orderly3.db", "query", info)
+  orderly2::orderly_plugin_add_metadata("orderly.db", "query", info)
   invisible()
 }
 
@@ -67,11 +67,11 @@ orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
 ##' @export
 orderly_db_connection <- function(as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
-  ctx <- orderly3::orderly_plugin_context("orderly3.db")
+  ctx <- orderly2::orderly_plugin_context("orderly.db")
   con <- open_connection(ctx$path, ctx$config, ctx$env, database, instance)
   ctx$env[[as]] <- con$connection
   info <- list(database = con$database, as = as)
-  orderly3::orderly_plugin_add_metadata("orderly3.db", "connection", info)
+  orderly2::orderly_plugin_add_metadata("orderly.db", "connection", info)
 }
 
 
