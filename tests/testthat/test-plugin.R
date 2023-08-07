@@ -10,7 +10,7 @@ test_that("basic plugin use works", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(names(meta_db), "query")
 
@@ -41,7 +41,7 @@ test_that("allow connection", {
   ## Connection should now have been invalidated:
   expect_false(DBI::dbIsValid(env$con))
 
-  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
@@ -73,7 +73,7 @@ test_that("allow connection without data", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_setequal(names(meta_db), "connection")
 
@@ -202,7 +202,7 @@ test_that("can read a query from a file", {
   env <- new.env()
   id <- orderly2::orderly_run("query", root = root, envir = env)
 
-  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(meta_db$query[[1]]$query,
                readLines(file.path(root, "src", "query", "query.sql")))
@@ -234,7 +234,7 @@ test_that("can interpolate parameters into query", {
   rownames(cmp) <- NULL
   expect_equal(d, cmp)
 
-  meta <- outpack::outpack_root_open(root)$metadata(id, TRUE)
+  meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly$plugins$orderly.db
   expect_equal(
     meta_db$query[[1]]$query,
