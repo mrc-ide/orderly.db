@@ -11,7 +11,7 @@ test_that("basic plugin use works", {
                mtcars_db)
 
   meta <- orderly2::orderly_metadata(id, root)
-  meta_db <- meta$custom$orderly$plugins$orderly.db
+  meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "query")
 
   expect_length(meta_db$query, 1)
@@ -42,7 +42,7 @@ test_that("allow connection", {
   expect_false(DBI::dbIsValid(env$con))
 
   meta <- orderly2::orderly_metadata(id, root)
-  meta_db <- meta$custom$orderly$plugins$orderly.db
+  meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
   expect_length(meta_db$query, 1)
@@ -74,7 +74,7 @@ test_that("allow connection without data", {
                mtcars_db)
 
   meta <- orderly2::orderly_metadata(id, root)
-  meta_db <- meta$custom$orderly$plugins$orderly.db
+  meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), "connection")
 
   expect_length(meta_db$connection, 1)
@@ -203,7 +203,7 @@ test_that("can read a query from a file", {
   id <- orderly2::orderly_run("query", root = root, envir = env)
 
   meta <- orderly2::orderly_metadata(id, root)
-  meta_db <- meta$custom$orderly$plugins$orderly.db
+  meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query[[1]]$query,
                readLines(file.path(root, "src", "query", "query.sql")))
 })
@@ -235,7 +235,7 @@ test_that("can interpolate parameters into query", {
   expect_equal(d, cmp)
 
   meta <- orderly2::orderly_metadata(id, root)
-  meta_db <- meta$custom$orderly$plugins$orderly.db
+  meta_db <- meta$custom$orderly.db
   expect_equal(
     meta_db$query[[1]]$query,
     sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
