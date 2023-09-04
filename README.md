@@ -10,7 +10,7 @@ This is an [`orderly2`](https://mrc-ide.github.io/orderly2) plugin for database 
 
 See `[vignette("introduction", package = "orderly.db")]` for details, and for information for migrating from `orderly`.
 
-**WARNING: We may update the metadata schema and API significantly until the package name changes from `orderly.db` to `orderly.db`, and we are not yet at a version that we anticipate providing an upgrade path to the final form, please use at even more of your own risk than usual.**
+**WARNING: We may update the metadata schema and API significantly, and we are not yet at a version that we anticipate providing an upgrade path to the final form, please use at even more of your own risk than usual.**
 
 ## Installation
 
