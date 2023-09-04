@@ -2,11 +2,11 @@ test_that("basic plugin use works", {
   root <- test_prepare_example("minimal",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("minimal", root = root, envir = env)
+  id <- orderly_run_quietly("minimal", root = root, envir = env)
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "minimal", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -29,12 +29,12 @@ test_that("allow connection", {
   root <- test_prepare_example("connection",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("connection", root = root, envir = env)
+  id <- orderly_run_quietly("connection", root = root, envir = env)
 
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connection", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -64,12 +64,12 @@ test_that("allow connection without data", {
   root <- test_prepare_example("connectiononly",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("connectiononly", root = root, envir = env)
+  id <- orderly_run_quietly("connectiononly", root = root, envir = env)
 
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connectiononly", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -149,7 +149,7 @@ test_that("must be specific if more than one db present", {
                                     other = list(iris = iris)))
   env <- new.env()
   expect_error(
-    orderly2::orderly_run("minimal", root = root, envir = env),
+    orderly_run_quietly("minimal", root = root, envir = env),
     "'database' must be given if there is more than one database")
 
   path_code <- file.path(root, "src", "minimal", "orderly.R")
@@ -159,7 +159,7 @@ test_that("must be specific if more than one db present", {
               code, fixed = TRUE)
   writeLines(code, path_code)
 
-  id <- orderly2::orderly_run("minimal", root = root, envir = env)
+  id <- orderly_run_quietly("minimal", root = root, envir = env)
   expect_equal(
     readRDS(file.path(root, "archive", "minimal", id, "data.rds")),
     mtcars_db)
@@ -169,7 +169,7 @@ test_that("must be specific if more than one db present", {
 test_that("sensible error if no databases configured", {
   root <- test_prepare_example("minimal", list())
   expect_error(
-    orderly2::orderly_run("minimal", root = root, envir = env),
+    orderly_run_quietly("minimal", root = root, envir = env),
     "orderly_config.yml:orderly.db must contain at least one database",
     fixed = TRUE)
 })
@@ -179,11 +179,11 @@ test_that("can construct a view, then read from it", {
   root <- test_prepare_example("view", list(source = list(mtcars = mtcars_db)))
 
   env <- new.env()
-  id <- orderly2::orderly_run("view", root = root, envir = env)
+  id <- orderly_run_quietly("view", root = root, envir = env)
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "view", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R", "log.json"))
+  expect_setequal(dir(path), c("data.rds", "orderly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db[c("mpg", "cyl")])
 
@@ -200,7 +200,7 @@ test_that("can read a query from a file", {
   root <- test_prepare_example("query",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("query", root = root, envir = env)
+  id <- orderly_run_quietly("query", root = root, envir = env)
 
   meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
@@ -214,7 +214,7 @@ test_that("can run a report with instances", {
                                list(main = list(mtcars = mtcars_db[1:10, ]),
                                     dev = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("instance", root = root, envir = env)
+  id <- orderly_run_quietly("instance", root = root, envir = env)
 
   d1 <- readRDS(file.path(root, "archive", "instance", id, "data1.rds"))
   d2 <- readRDS(file.path(root, "archive", "instance", id, "data2.rds"))
@@ -227,8 +227,8 @@ test_that("can interpolate parameters into query", {
   root <- test_prepare_example("interpolate",
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
-  id <- orderly2::orderly_run("interpolate", list(mpg_min = 30),
-                              root = root, envir = env)
+  id <- orderly_run_quietly("interpolate", list(mpg_min = 30),
+                            root = root, envir = env)
   d <- readRDS(file.path(root, "archive", "interpolate", id, "data.rds"))
   cmp <- mtcars_db[mtcars_db$mpg > 30, ]
   rownames(cmp) <- NULL
