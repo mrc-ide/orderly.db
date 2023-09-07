@@ -7,8 +7,6 @@
 orderly_db_connection(as, database = NULL, instance = NULL)
 }
 \arguments{
-\item{as}{Name of the object create}
-
 \item{database}{The name of the database. This can be omitted (or
 \code{NULL}) where you only have a single database, but must be
 specified if you have more than one database configured.}
@@ -18,7 +16,7 @@ specified if you have more than one database configured.}
 used instances or where you have only one configured.}
 }
 \value{
-Undefined
+The connection object
 }
 \description{
 Create a persistent connection object to the database

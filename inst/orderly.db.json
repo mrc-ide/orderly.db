@@ -13,9 +13,6 @@
                     "database": {
                         "type": "string"
                     },
-                    "as": {
-                        "type": "string"
-                    },
                     "query": {
                         "type": "string"
                     },
@@ -29,7 +26,7 @@
                         }
                     }
                 },
-                "required": ["database", "as", "query", "rows", "cols"]
+                "required": ["database", "query", "rows", "cols"]
                 "additionalProperties": false
             }
         },
@@ -59,12 +56,9 @@
                 "properties": {
                     "database": {
                         "type": "string"
-                    },
-                    "as": {
-                        "type": "string"
                     }
                 },
-                "required": ["database", "as"]
+                "required": ["database"]
                 "additionalProperties": false
             }
         }
