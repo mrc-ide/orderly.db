@@ -60,16 +60,12 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orderly_db_connection</span><span class="op">(</span><span class="va">as</span>, database <span class="op">=</span> <span class="cn">NULL</span>, instance <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orderly_db_connection</span><span class="op">(</span>database <span class="op">=</span> <span class="cn">NULL</span>, instance <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>as</dt>
-<dd><p>Name of the object create</p></dd>
-
-
-<dt>database</dt>
+    <dl><dt>database</dt>
 <dd><p>The name of the database. This can be omitted (or
 <code>NULL</code>) where you only have a single database, but must be
 specified if you have more than one database configured.</p></dd>
@@ -85,7 +81,7 @@ used instances or where you have only one configured.</p></dd>
     <h2>Value</h2>
     
 
-<p>Undefined</p>
+<p>The connection object</p>
     </div>
 
   </div>
