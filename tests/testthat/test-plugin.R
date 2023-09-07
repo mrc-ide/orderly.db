@@ -16,8 +16,7 @@ test_that("basic plugin use works", {
 
   expect_length(meta_db$query, 1)
   expect_setequal(names(meta_db$query[[1]]),
-                  c("as", "database", "query", "rows", "cols"))
-  expect_equal(meta_db$query[[1]]$as, "dat1")
+                  c("database", "query", "rows", "cols"))
   expect_equal(meta_db$query[[1]]$database, "source")
   expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
   expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
@@ -47,8 +46,7 @@ test_that("allow connection", {
 
   expect_length(meta_db$query, 1)
   expect_setequal(names(meta_db$query[[1]]),
-                  c("as", "database", "query", "rows", "cols"))
-  expect_equal(meta_db$query[[1]]$as, "dat")
+                  c("database", "query", "rows", "cols"))
   expect_equal(meta_db$query[[1]]$database, "source")
   expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
   expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
@@ -56,7 +54,7 @@ test_that("allow connection", {
 
   expect_length(meta_db$connection, 1)
   expect_mapequal(meta_db$connection[[1]],
-                  list(database = "source", as = "con"))
+                  list(database = "source"))
 })
 
 
@@ -79,7 +77,7 @@ test_that("allow connection without data", {
 
   expect_length(meta_db$connection, 1)
   expect_mapequal(meta_db$connection[[1]],
-                  list(database = "source", as = "con"))
+                  list(database = "source"))
 })
 
 
@@ -239,4 +237,15 @@ test_that("can interpolate parameters into query", {
   expect_equal(
     meta_db$query[[1]]$query,
     sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
+})
+
+
+test_that("can run plugin interactively", {
+  root <- test_prepare_example("minimal",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  path_src <- file.path(root, "src", "minimal")
+  withr::with_dir(path_src, sys.source("orderly.R", env))
+  expect_equal(env$dat1, mtcars_db)
+  expect_true(file.exists(file.path(path_src, "data.rds")))
 })

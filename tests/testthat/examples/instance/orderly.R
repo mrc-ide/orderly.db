@@ -1,11 +1,9 @@
-orderly.db::orderly_db_query(
+dat1 <- orderly.db::orderly_db_query(
   query = "SELECT * FROM mtcars",
-  as = "dat1",
   database = "db",
   instance = "main")
-orderly.db::orderly_db_query(
+dat2 <- orderly.db::orderly_db_query(
   query = "SELECT * FROM mtcars",
-  as = "dat2",
   database = "db",
   instance = "dev")
 

@@ -12,7 +12,7 @@
 ##' @export
 orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
   assert_scalar_character(as)
-  ctx <- orderly2::orderly_plugin_context("orderly.db")
+  ctx <- orderly2::orderly_plugin_context("orderly.db", parent.frame())
   query <- check_query(query, ctx)
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
   sql <- sprintf("CREATE TEMPORARY VIEW %s AS\n%s", as, query)
@@ -29,8 +29,6 @@ orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
 ##'
 ##' @param query Query to evaluate
 ##'
-##' @param as Name of the object to create
-##'
 ##' @param database The name of the database. This can be omitted (or
 ##'   `NULL`) where you only have a single database, but must be
 ##'   specified if you have more than one database configured.
@@ -39,19 +37,17 @@ orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
 ##'   `database`). This can be omitted (or `NULL`) where you have not
 ##'   used instances or where you have only one configured.
 ##'
-##' @return Undefined
+##' @return The extracted data
 ##' @export
-orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
-  assert_scalar_character(as)
-  ctx <- orderly2::orderly_plugin_context("orderly.db")
+orderly_db_query <- function(query, database = NULL, instance = NULL) {
+  ctx <- orderly2::orderly_plugin_context("orderly.db", parent.frame())
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
   query <- check_query(query, ctx)
   d <- DBI::dbGetQuery(con$connection, query)
-  ctx$envir[[as]] <- d
-  info <- list(database = con$database, as = as, query = query,
+  info <- list(database = con$database, query = query,
                rows = nrow(d), cols = names(d))
   orderly2::orderly_plugin_add_metadata("orderly.db", "query", info)
-  invisible()
+  d
 }
 
 
@@ -59,19 +55,16 @@ orderly_db_query <- function(query, as, database = NULL, instance = NULL) {
 ##'
 ##' @title Create connection to database
 ##'
-##' @param as Name of the object create
-##'
 ##' @inheritParams orderly_db_query
 ##'
-##' @return Undefined
+##' @return The connection object
 ##' @export
-orderly_db_connection <- function(as, database = NULL, instance = NULL) {
-  assert_scalar_character(as)
-  ctx <- orderly2::orderly_plugin_context("orderly.db")
+orderly_db_connection <- function(database = NULL, instance = NULL) {
+  ctx <- orderly2::orderly_plugin_context("orderly.db", parent.frame())
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
-  ctx$envir[[as]] <- con$connection
-  info <- list(database = con$database, as = as)
+  info <- list(database = con$database)
   orderly2::orderly_plugin_add_metadata("orderly.db", "connection", info)
+  con$connection
 }
 
 
