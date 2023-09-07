@@ -4,7 +4,7 @@
 \alias{orderly_db_connection}
 \title{Create connection to database}
 \usage{
-orderly_db_connection(as, database = NULL, instance = NULL)
+orderly_db_connection(database = NULL, instance = NULL)
 }
 \arguments{
 \item{database}{The name of the database. This can be omitted (or
