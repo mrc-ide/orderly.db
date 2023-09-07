@@ -238,3 +238,14 @@ test_that("can interpolate parameters into query", {
     meta_db$query[[1]]$query,
     sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
 })
+
+
+test_that("can run plugin interactively", {
+  root <- test_prepare_example("minimal",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  path_src <- file.path(root, "src", "minimal")
+  withr::with_dir(path_src, sys.source("orderly.R", env))
+  expect_equal(env$dat1, mtcars_db)
+  expect_true(file.exists(file.path(path_src, "data.rds")))
+})
