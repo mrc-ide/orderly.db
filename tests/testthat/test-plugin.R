@@ -189,6 +189,14 @@ test_that("can construct a view, then read from it", {
     ## View not present here, it was only available to the client that
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
+
+  meta <- orderly2::orderly_metadata(id, root)
+  meta_db <- meta$custom$orderly.db
+  expect_setequal(names(meta_db), c("query", "view"))
+  expect_equal(meta_db$view,
+               data_frame(database = "source",
+                          as = "thedata",
+                          query = "SELECT mpg, cyl FROM mtcars"))
 })
 
 
