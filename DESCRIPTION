@@ -22,6 +22,7 @@ Imports:
     orderly2 (>= 1.99.10)
 Suggests:
     RSQLite,
+    jsonvalidate (>= 1.4.0),
     knitr,
     mockery,
     rmarkdown,

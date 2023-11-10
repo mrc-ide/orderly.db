@@ -5,7 +5,7 @@
 
     "type": "object",
     "properties": {
-        "data": {
+        "query": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -22,11 +22,11 @@
                     "cols": {
                         "type": "array",
                         "items": {
-                            "type": "character"
+                            "type": "string"
                         }
                     }
                 },
-                "required": ["database", "query", "rows", "cols"]
+                "required": ["database", "query", "rows", "cols"],
                 "additionalProperties": false
             }
         },
@@ -45,7 +45,7 @@
                         "type": "string"
                     }
                 },
-                "required": ["database", "as", "query"]
+                "required": ["database", "as", "query"],
                 "additionalProperties": false
             }
         },
@@ -58,7 +58,7 @@
                         "type": "string"
                     }
                 },
-                "required": ["database"]
+                "required": ["database"],
                 "additionalProperties": false
             }
         }

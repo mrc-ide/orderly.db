@@ -1,3 +1,7 @@
+options(outpack.schema_validate =
+          requireNamespace("jsonvalidate", quietly = TRUE) &&
+          packageVersion("jsonvalidate") >= "1.4.0")
+
 mtcars_db <- cbind(name = rownames(mtcars), mtcars)
 rownames(mtcars_db) <- NULL
 
