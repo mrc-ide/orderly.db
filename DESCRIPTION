@@ -19,7 +19,7 @@ Imports:
     DBI,
     fs,
     jsonlite,
-    orderly2 (>= 1.99.0)
+    orderly2 (>= 1.99.10)
 Suggests:
     RSQLite,
     knitr,
