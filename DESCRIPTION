@@ -30,7 +30,7 @@ Suggests:
     withr
 Config/testthat/edition: 3
 Remotes:
-  mrc-ide/orderly2@mrc-4437,
+  mrc-ide/orderly2,
   ropensci/jsonvalidate
 VignetteBuilder: knitr
 Language: en-GB
