@@ -19,15 +19,18 @@ Imports:
     DBI,
     fs,
     jsonlite,
-    orderly2 (>= 1.99.0)
+    orderly2 (>= 1.99.10)
 Suggests:
     RSQLite,
+    jsonvalidate (>= 1.4.0),
     knitr,
     mockery,
     rmarkdown,
     testthat (>= 3.0.0),
     withr
 Config/testthat/edition: 3
-Remotes: mrc-ide/orderly2
+Remotes:
+  mrc-ide/orderly2,
+  ropensci/jsonvalidate
 VignetteBuilder: knitr
 Language: en-GB

@@ -14,13 +14,13 @@ test_that("basic plugin use works", {
   meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "query")
 
-  expect_length(meta_db$query, 1)
-  expect_setequal(names(meta_db$query[[1]]),
-                  c("database", "query", "rows", "cols"))
-  expect_equal(meta_db$query[[1]]$database, "source")
-  expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
-  expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
-  expect_equal(meta_db$query[[1]]$query, "SELECT * FROM mtcars")
+  expect_equal(nrow(meta_db$query), 1)
+  expect_equal(names(meta_db$query),
+               c("database", "query", "rows", "cols"))
+  expect_equal(meta_db$query$database, "source")
+  expect_equal(meta_db$query$rows, nrow(mtcars_db))
+  expect_equal(meta_db$query$cols, I(list(names(mtcars_db))))
+  expect_equal(meta_db$query$query, "SELECT * FROM mtcars")
 })
 
 
@@ -44,17 +44,16 @@ test_that("allow connection", {
   meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
-  expect_length(meta_db$query, 1)
-  expect_setequal(names(meta_db$query[[1]]),
-                  c("database", "query", "rows", "cols"))
-  expect_equal(meta_db$query[[1]]$database, "source")
-  expect_equal(meta_db$query[[1]]$rows, nrow(mtcars_db))
-  expect_equal(meta_db$query[[1]]$cols, as.list(names(mtcars_db)))
-  expect_equal(meta_db$query[[1]]$query, "SELECT * FROM mtcars")
+  expect_equal(nrow(meta_db$query), 1)
+  expect_equal(names(meta_db$query),
+               c("database", "query", "rows", "cols"))
+  expect_equal(meta_db$query$database, "source")
+  expect_equal(meta_db$query$rows, nrow(mtcars_db))
+  expect_equal(meta_db$query$cols, I(list(names(mtcars_db))))
+  expect_equal(meta_db$query$query, "SELECT * FROM mtcars")
 
-  expect_length(meta_db$connection, 1)
-  expect_mapequal(meta_db$connection[[1]],
-                  list(database = "source"))
+  expect_equal(nrow(meta_db$connection), 1)
+  expect_mapequal(meta_db$connection, data_frame(database = "source"))
 })
 
 
@@ -73,11 +72,10 @@ test_that("allow connection without data", {
 
   meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
-  expect_setequal(names(meta_db), "connection")
+  expect_equal(names(meta_db), "connection")
 
-  expect_length(meta_db$connection, 1)
-  expect_mapequal(meta_db$connection[[1]],
-                  list(database = "source"))
+  expect_equal(nrow(meta_db$connection), 1)
+  expect_equal(meta_db$connection, data_frame(database = "source"))
 })
 
 
@@ -191,6 +189,14 @@ test_that("can construct a view, then read from it", {
     ## View not present here, it was only available to the client that
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
+
+  meta <- orderly2::orderly_metadata(id, root)
+  meta_db <- meta$custom$orderly.db
+  expect_setequal(names(meta_db), c("query", "view"))
+  expect_equal(meta_db$view,
+               data_frame(database = "source",
+                          as = "thedata",
+                          query = "SELECT mpg, cyl FROM mtcars"))
 })
 
 
@@ -202,7 +208,7 @@ test_that("can read a query from a file", {
 
   meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
-  expect_equal(meta_db$query[[1]]$query,
+  expect_equal(meta_db$query$query,
                readLines(file.path(root, "src", "query", "query.sql")))
 })
 
@@ -235,7 +241,7 @@ test_that("can interpolate parameters into query", {
   meta <- orderly2::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(
-    meta_db$query[[1]]$query,
+    meta_db$query$query,
     sql_str_sub("SELECT * FROM mtcars WHERE mpg > 30"))
 })
 

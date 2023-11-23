@@ -84,5 +84,25 @@ check_symbol_from_str <- function(str, name) {
 }
 
 
+vcapply <- function(...) {
+  vapply(..., FUN.VALUE = character(1))
+}
+
+
+viapply <- function(...) {
+  vapply(..., FUN.VALUE = integer(1))
+}
+
+
+list_to_character <- function(x) {
+  vcapply(x, identity, USE.NAMES = FALSE)
+}
+
+
+data_frame <- function(...) {
+  data.frame(..., stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+
 ## this one is fairly unpleasant
 file_exists <- orderly2:::file_exists

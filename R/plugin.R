@@ -60,6 +60,28 @@ orderly_db_serialise <- function(data) {
 }
 
 
+orderly_db_deserialise <- function(data) {
+  if (!is.null(data$query)) {
+    data$query <- data_frame(
+      database = vcapply(data$query, "[[", "database"),
+      query = vcapply(data$query, "[[", "query"),
+      rows = viapply(data$query, "[[", "rows"),
+      cols = I(lapply(data$query, function(x) list_to_character(x$cols))))
+  }
+  if (!is.null(data$view)) {
+    data$view <- data_frame(
+      database = vcapply(data$view, "[[", "database"),
+      as = vcapply(data$view, "[[", "as"),
+      query = vcapply(data$view, "[[", "query"))
+  }
+  if (!is.null(data$connection)) {
+    data$connection <- data_frame(
+      database = vcapply(data$connection, "[[", "database"))
+  }
+  data
+}
+
+
 orderly_db_cleanup <- function() {
   ctx <- orderly2::orderly_plugin_context("orderly.db")
   local_connections_close(ctx$path)
