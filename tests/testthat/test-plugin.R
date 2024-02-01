@@ -16,11 +16,31 @@ test_that("basic plugin use works", {
 
   expect_equal(nrow(meta_db$query), 1)
   expect_equal(names(meta_db$query),
-               c("database", "query", "rows", "cols"))
+               c("database", "instance", "query", "rows", "cols", "name"))
   expect_equal(meta_db$query$database, "source")
   expect_equal(meta_db$query$rows, nrow(mtcars_db))
   expect_equal(meta_db$query$cols, I(list(names(mtcars_db))))
   expect_equal(meta_db$query$query, "SELECT * FROM mtcars")
+  expect_equal(meta_db$query$instance, NA_character_)
+  expect_equal(meta_db$query$name, NA_character_)
+})
+
+
+test_that("can name output for later reference", {
+  root <- test_prepare_example("named",
+                               list(source = list(mtcars = mtcars_db)))
+  env <- new.env()
+  id <- orderly_run_quietly("named", root = root, envir = env)
+  expect_type(id, "character")
+
+  path <- file.path(root, "archive", "named", id)
+  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_equal(readRDS(file.path(path, "data.rds")),
+               mtcars_db)
+
+  meta <- orderly2::orderly_metadata(id, root)
+  meta_db <- meta$custom$orderly.db
+  expect_equal(meta_db$query$name, "input")
 })
 
 
@@ -46,14 +66,16 @@ test_that("allow connection", {
 
   expect_equal(nrow(meta_db$query), 1)
   expect_equal(names(meta_db$query),
-               c("database", "query", "rows", "cols"))
+               c("database", "instance", "query", "rows", "cols", "name"))
   expect_equal(meta_db$query$database, "source")
   expect_equal(meta_db$query$rows, nrow(mtcars_db))
   expect_equal(meta_db$query$cols, I(list(names(mtcars_db))))
   expect_equal(meta_db$query$query, "SELECT * FROM mtcars")
+  expect_equal(meta_db$query$instance, NA_character_)
 
   expect_equal(nrow(meta_db$connection), 1)
-  expect_mapequal(meta_db$connection, data_frame(database = "source"))
+  expect_mapequal(meta_db$connection,
+                  data_frame(database = "source", instance = NA_character_))
 })
 
 
@@ -75,7 +97,8 @@ test_that("allow connection without data", {
   expect_equal(names(meta_db), "connection")
 
   expect_equal(nrow(meta_db$connection), 1)
-  expect_equal(meta_db$connection, data_frame(database = "source"))
+  expect_equal(meta_db$connection,
+               data_frame(database = "source", instance = NA_character_))
 })
 
 
@@ -195,6 +218,7 @@ test_that("can construct a view, then read from it", {
   expect_setequal(names(meta_db), c("query", "view"))
   expect_equal(meta_db$view,
                data_frame(database = "source",
+                          instance = NA_character_,
                           as = "thedata",
                           query = "SELECT mpg, cyl FROM mtcars"))
 })
@@ -222,8 +246,14 @@ test_that("can run a report with instances", {
 
   d1 <- readRDS(file.path(root, "archive", "instance", id, "data1.rds"))
   d2 <- readRDS(file.path(root, "archive", "instance", id, "data2.rds"))
+
   expect_equal(d1, mtcars_db[1:10, ])
   expect_equal(d2, mtcars_db)
+
+  meta <- orderly2::orderly_metadata(id, root)
+  meta_db <- meta$custom$orderly.db
+  expect_equal(meta_db$query$instance, c("main", "dev"))
+  expect_equal(meta_db$query$rows, c(10, 32))
 })
 
 

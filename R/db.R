@@ -17,7 +17,10 @@ orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
   sql <- sprintf("CREATE TEMPORARY VIEW %s AS\n%s", as, query)
   DBI::dbExecute(con$connection, sql)
-  info <- list(database = con$database, as = as, query = query)
+  info <- list(database = con$database,
+               as = as,
+               query = query,
+               instance = instance)
   orderly2::orderly_plugin_add_metadata("orderly.db", "view", info)
   invisible()
 }
@@ -37,15 +40,26 @@ orderly_db_view <- function(query, as, database = NULL, instance = NULL) {
 ##'   `database`). This can be omitted (or `NULL`) where you have not
 ##'   used instances or where you have only one configured.
 ##'
+##' @param name An optional name that you can use to look up this
+##'   query in your metadata.
+##'
 ##' @return The extracted data
 ##' @export
-orderly_db_query <- function(query, database = NULL, instance = NULL) {
+orderly_db_query <- function(query, database = NULL, instance = NULL,
+                             name = NULL) {
   ctx <- orderly2::orderly_plugin_context("orderly.db", parent.frame())
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
   query <- check_query(query, ctx)
+  if (!is.null(name)) {
+    assert_scalar_character(name)
+  }
   d <- DBI::dbGetQuery(con$connection, query)
-  info <- list(database = con$database, query = query,
-               rows = nrow(d), cols = names(d))
+  info <- list(database = con$database,
+               instance = instance,
+               query = query,
+               rows = nrow(d),
+               cols = names(d),
+               name = name)
   orderly2::orderly_plugin_add_metadata("orderly.db", "query", info)
   d
 }
@@ -62,7 +76,8 @@ orderly_db_query <- function(query, database = NULL, instance = NULL) {
 orderly_db_connection <- function(database = NULL, instance = NULL) {
   ctx <- orderly2::orderly_plugin_context("orderly.db", parent.frame())
   con <- open_connection(ctx$path, ctx$config, ctx$envir, database, instance)
-  info <- list(database = con$database)
+  info <- list(database = con$database,
+               instance = instance)
   orderly2::orderly_plugin_add_metadata("orderly.db", "connection", info)
   con$connection
 }
