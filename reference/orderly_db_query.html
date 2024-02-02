@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">orderly.db</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.3</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orderly_db_query</span><span class="op">(</span><span class="va">query</span>, database <span class="op">=</span> <span class="cn">NULL</span>, instance <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">orderly_db_query</span><span class="op">(</span><span class="va">query</span>, database <span class="op">=</span> <span class="cn">NULL</span>, instance <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -79,6 +79,11 @@ specified if you have more than one database configured.</p></dd>
 <dd><p>The instance of the database (within a given
 <code>database</code>). This can be omitted (or <code>NULL</code>) where you have not
 used instances or where you have only one configured.</p></dd>
+
+
+<dt>name</dt>
+<dd><p>An optional name that you can use to look up this
+query in your metadata.</p></dd>
 
 </dl></div>
     <div id="value">
