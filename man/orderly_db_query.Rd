@@ -4,7 +4,7 @@
 \alias{orderly_db_query}
 \title{Extract data from a database}
 \usage{
-orderly_db_query(query, database = NULL, instance = NULL)
+orderly_db_query(query, database = NULL, instance = NULL, name = NULL)
 }
 \arguments{
 \item{query}{Query to evaluate}
@@ -16,6 +16,9 @@ specified if you have more than one database configured.}
 \item{instance}{The instance of the database (within a given
 \code{database}). This can be omitted (or \code{NULL}) where you have not
 used instances or where you have only one configured.}
+
+\item{name}{An optional name that you can use to look up this
+query in your metadata.}
 }
 \value{
 The extracted data

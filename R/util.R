@@ -104,5 +104,12 @@ data_frame <- function(...) {
 }
 
 
+get_or_na_string <- function(name) {
+  function(x) {
+    x[[name]] %||% NA_character_
+  }
+}
+
+
 ## this one is fairly unpleasant
 file_exists <- orderly2:::file_exists

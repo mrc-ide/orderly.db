@@ -13,6 +13,9 @@
                     "database": {
                         "type": "string"
                     },
+                    "instance": {
+                        "type": ["null", "string"]
+                    },
                     "query": {
                         "type": "string"
                     },
@@ -24,9 +27,12 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "name": {
+                        "type": ["null", "string"]
                     }
                 },
-                "required": ["database", "query", "rows", "cols"],
+                "required": ["database", "instance", "query", "rows", "cols", "name"],
                 "additionalProperties": false
             }
         },
@@ -38,6 +44,9 @@
                     "database": {
                         "type": "string"
                     },
+                    "instance": {
+                        "type": ["null", "string"]
+                    },
                     "as": {
                         "type": "string"
                     },
@@ -45,7 +54,7 @@
                         "type": "string"
                     }
                 },
-                "required": ["database", "as", "query"],
+                "required": ["database", "instance", "as", "query"],
                 "additionalProperties": false
             }
         },
@@ -56,9 +65,12 @@
                 "properties": {
                     "database": {
                         "type": "string"
+                    },
+                    "instance": {
+                        "type": ["null", "string"]
                     }
                 },
-                "required": ["database"],
+                "required": ["database", "instance"],
                 "additionalProperties": false
             }
         }

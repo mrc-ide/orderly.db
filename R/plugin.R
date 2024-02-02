@@ -64,19 +64,23 @@ orderly_db_deserialise <- function(data) {
   if (!is.null(data$query)) {
     data$query <- data_frame(
       database = vcapply(data$query, "[[", "database"),
+      instance = vcapply(data$query, get_or_na_string("instance")),
       query = vcapply(data$query, "[[", "query"),
       rows = viapply(data$query, "[[", "rows"),
-      cols = I(lapply(data$query, function(x) list_to_character(x$cols))))
+      cols = I(lapply(data$query, function(x) list_to_character(x$cols))),
+      name = vcapply(data$query, get_or_na_string("name")))
   }
   if (!is.null(data$view)) {
     data$view <- data_frame(
       database = vcapply(data$view, "[[", "database"),
+      instance = vcapply(data$view, get_or_na_string("instance")),
       as = vcapply(data$view, "[[", "as"),
       query = vcapply(data$view, "[[", "query"))
   }
   if (!is.null(data$connection)) {
     data$connection <- data_frame(
-      database = vcapply(data$connection, "[[", "database"))
+      database = vcapply(data$connection, "[[", "database"),
+      instance = vcapply(data$connection, get_or_na_string("instance")))
   }
   data
 }
