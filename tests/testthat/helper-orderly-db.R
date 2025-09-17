@@ -8,7 +8,7 @@ rownames(mtcars_db) <- NULL
 test_prepare_example <- function(examples, data) {
   tmp <- tempfile()
   withr::defer_parent(unlink(tmp, recursive = TRUE))
-  suppressMessages(orderly2::orderly_init(tmp))
+  suppressMessages(orderly::orderly_init(tmp))
 
   cfg_base <- "minimum_orderly_version: 1.99.0"
 
@@ -63,5 +63,5 @@ clear_local_connections <- function() {
 
 
 orderly_run_quietly <- function(..., echo = FALSE) {
-  suppressMessages(orderly2::orderly_run(..., echo = echo))
+  suppressMessages(orderly::orderly_run(..., echo = echo))
 }

@@ -6,11 +6,11 @@ test_that("basic plugin use works", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "minimal", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "minimal.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "query")
 
@@ -34,11 +34,11 @@ test_that("can name output for later reference", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "named", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "named.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$name, "input")
 })
@@ -53,14 +53,14 @@ test_that("allow connection", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connection", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "connection.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
   ## Connection should now have been invalidated:
   expect_false(DBI::dbIsValid(env$con))
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
@@ -88,11 +88,11 @@ test_that("allow connection without data", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connectiononly", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "connectiononly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "connection")
 
@@ -171,7 +171,7 @@ test_that("must be specific if more than one db present", {
     orderly_run_quietly("minimal", root = root, envir = env),
     "'database' must be given if there is more than one database")
 
-  path_code <- file.path(root, "src", "minimal", "orderly.R")
+  path_code <- file.path(root, "src", "minimal", "minimal.R")
   code <- readLines(path_code)
   code <- sub("orderly.db::orderly_db_query(",
               'orderly.db::orderly_db_query(database = "source",',
@@ -202,7 +202,7 @@ test_that("can construct a view, then read from it", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "view", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "view.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db[c("mpg", "cyl")])
 
@@ -213,7 +213,7 @@ test_that("can construct a view, then read from it", {
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "view"))
   expect_equal(meta_db$view,
@@ -230,7 +230,7 @@ test_that("can read a query from a file", {
   env <- new.env()
   id <- orderly_run_quietly("query", root = root, envir = env)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$query,
                readLines(file.path(root, "src", "query", "query.sql")))
@@ -250,7 +250,7 @@ test_that("can run a report with instances", {
   expect_equal(d1, mtcars_db[1:10, ])
   expect_equal(d2, mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$instance, c("main", "dev"))
   expect_equal(meta_db$query$rows, c(10, 32))
@@ -268,7 +268,7 @@ test_that("can interpolate parameters into query", {
   rownames(cmp) <- NULL
   expect_equal(d, cmp)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(
     meta_db$query$query,
@@ -281,7 +281,7 @@ test_that("can run plugin interactively", {
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
   path_src <- file.path(root, "src", "minimal")
-  withr::with_dir(path_src, sys.source("orderly.R", env))
+  withr::with_dir(path_src, sys.source("minimal.R", env))
   expect_equal(env$dat1, mtcars_db)
   expect_true(file.exists(file.path(path_src, "data.rds")))
 })

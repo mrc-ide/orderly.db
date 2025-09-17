@@ -87,7 +87,7 @@ orderly_db_deserialise <- function(data) {
 
 
 orderly_db_cleanup <- function() {
-  ctx <- orderly2::orderly_plugin_context("orderly.db")
+  ctx <- orderly::orderly_plugin_context("orderly.db")
   local_connections_close(ctx$path)
 }
 

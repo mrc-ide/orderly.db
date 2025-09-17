@@ -1,4 +1,4 @@
-orderly2::orderly_artefact("Some data", "data.rds")
+orderly::orderly_artefact(description = "Some data", files = "data.rds")
 orderly.db::orderly_db_view(
   as = "thedata",
   query = "SELECT mpg, cyl FROM mtcars")

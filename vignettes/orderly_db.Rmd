@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `orderly.db` package is an `orderly2` plugin which provides support for interacting with databases. It includes all core features that `orderly` (version 1) supported, but with the new syntax.
+The `orderly.db` package is an [`orderly`](https://mrc-ide.github.io/orderly/) plugin which provides support for interacting with databases. It includes all core features that `orderly` (version 1) supported, but with the new syntax.
 
 This documentation is based off the original orderly vignette. There is a section at the end of the vignette with some comparisons of old and new syntaxes.
 
@@ -48,11 +48,11 @@ For [SQLite](https://cran.r-project.org/package=RSQLite) databases, the `args` b
 
 ## Use within a report
 
-Within a report's `orderly.R` file, you can extract data from the database as:
+Within a report's main script file, you can extract data from the database as:
 
 ```r
 orderly.db::orderly_db_data(as = "cars", database = "source",
-                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+                            query = "SELECT * FROM mtcars WHERE cyl = 4")
 ```
 
 In this case, the query `SELECT * FROM mtcars WHERE cyl = 4` will be run against the `source` database to create an object `cars` in the report environment.  The actual report code can use that object without having ever created the database connection or evaluating the query.
@@ -60,20 +60,20 @@ In this case, the query `SELECT * FROM mtcars WHERE cyl = 4` will be run against
 You can interpolate parameters into the query; for example you might have:
 
 ```r
-orderly2::orderly_parameter(cyl = NULL)
+pars <- orderly::orderly_parameters(cyl = NULL)
 orderly.db::orderly_db_data(as = "cars", database = "source",
-                             query = "SELECT * FROM mtcars WHERE cyl = ?cyl")
+                            query = "SELECT * FROM mtcars WHERE cyl = ?cyl")
 ```
 
-In the above, we declare an orderly parameter `cyl` with no default (see `?orderly2::orderly_parameter`) and use `?cyl` to interpolate that into the query (see `?DBI::sqlInterpolate` which does the interpolation for us). You can only use orderly varibles for this; if you need more complex substitution you can create strings using `paste` or `sprintf` as suits your needs.
+In the above, we declare an orderly parameter `cyl` with no default (see `?orderly::orderly_parameters`) and use `?cyl` to interpolate that into the query (see `?DBI::sqlInterpolate` which does the interpolation for us). You can only use orderly varibles for this; if you need more complex substitution you can create strings using `paste` or `sprintf` as suits your needs.
 
 You can establish temporary views in the database in order to simplify queries. For example, you might write:
 
 ```r
 orderly.db::orderly_db_view(as = "cars4", database = "source",
-                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+                            query = "SELECT * FROM mtcars WHERE cyl = 4")
 orderly.db::orderly_db_data(as = "cars", database = "source",
-                             query = "SELECT * FROM cars4")
+                            query = "SELECT * FROM cars4")
 ```
 
 Here, we establish a view called `cars4` within the database; this is scoped to the current connection (`orderly.db` ensures that the same connection is used for all calls to the database within a report run). Then we query against that view to pull the data down as the `cars` R object. In a real case this view could be more complicated, involving joins with other tables.
@@ -180,14 +180,14 @@ Here - staging and production have different hostnames (`production.example.org`
 
 ```r
 orderly.db::orderly_db_data(as = "cars", database = "source", query = query,
-                             instance = "production")
+                            instance = "production")
 ```
 
 or
 
 ```r
 orderly.db::orderly_db_data(as = "cars", database = "source", query = query,
-                             instance = "staging")
+                            instance = "staging")
 ```
 
 If you pass a value of `NULL` for `instance`, then we fall back on the default instance (and if none is specified, throw an error).  You might like to make this a parameter to your report to allow changing the instance dynamically when running.
@@ -208,7 +208,7 @@ becomes
 
 ```r
 orderly.db::orderly_db_data(as = "cars", database = "source",
-                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+                            query = "SELECT * FROM mtcars WHERE cyl = 4")
 ```
 
 Establishing views
@@ -225,7 +225,7 @@ becomes
 
 ```r
 orderly.db::orderly_db_view(as = "cars4", database = "source",
-                             query = "SELECT * FROM mtcars WHERE cyl = 4")
+                            query = "SELECT * FROM mtcars WHERE cyl = 4")
 ```
 
 Exporting connections
