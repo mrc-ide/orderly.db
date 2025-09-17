@@ -1,16 +1,14 @@
 # orderly.db
 
 <!-- badges: start -->
-[![Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept.](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R-CMD-check](https://github.com/mrc-ide/orderly.db/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mrc-ide/orderly.db/actions/workflows/R-CMD-check.yaml)
-[![codecov.io](https://codecov.io/github/mrc-ide/orderly.db/coverage.svg?branch=main)](https://codecov.io/github/mrc-ide/orderly.db?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/mrc-ide/orderly.db/graph/badge.svg)](https://app.codecov.io/gh/mrc-ide/orderly.db)
 <!-- badges: end -->
 
 This is an [`orderly`](https://mrc-ide.github.io/orderly/) plugin for database access.
 
 See `[vignette("introduction", package = "orderly.db")]` for details, and for information for migrating from `orderly`.
-
-**WARNING: We may update the metadata schema and API significantly, and we are not yet at a version that we anticipate providing an upgrade path to the final form, please use at even more of your own risk than usual.**
 
 ## Installation
 
