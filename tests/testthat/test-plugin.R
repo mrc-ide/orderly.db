@@ -6,7 +6,7 @@ test_that("basic plugin use works", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "minimal", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "minimal.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -34,7 +34,7 @@ test_that("can name output for later reference", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "named", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "named.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -53,7 +53,7 @@ test_that("allow connection", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connection", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "connection.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -88,7 +88,7 @@ test_that("allow connection without data", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "connectiononly", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "connectiononly.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
@@ -171,7 +171,7 @@ test_that("must be specific if more than one db present", {
     orderly_run_quietly("minimal", root = root, envir = env),
     "'database' must be given if there is more than one database")
 
-  path_code <- file.path(root, "src", "minimal", "orderly.R")
+  path_code <- file.path(root, "src", "minimal", "minimal.R")
   code <- readLines(path_code)
   code <- sub("orderly.db::orderly_db_query(",
               'orderly.db::orderly_db_query(database = "source",',
@@ -202,7 +202,7 @@ test_that("can construct a view, then read from it", {
   expect_type(id, "character")
 
   path <- file.path(root, "archive", "view", id)
-  expect_setequal(dir(path), c("data.rds", "orderly.R"))
+  expect_setequal(dir(path), c("data.rds", "view.R"))
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db[c("mpg", "cyl")])
 
@@ -281,7 +281,7 @@ test_that("can run plugin interactively", {
                                list(source = list(mtcars = mtcars_db)))
   env <- new.env()
   path_src <- file.path(root, "src", "minimal")
-  withr::with_dir(path_src, sys.source("orderly.R", env))
+  withr::with_dir(path_src, sys.source("minimal.R", env))
   expect_equal(env$dat1, mtcars_db)
   expect_true(file.exists(file.path(path_src, "data.rds")))
 })

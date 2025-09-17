@@ -1,4 +1,4 @@
-orderly::orderly_artefact("Some data", "data.rds")
+orderly::orderly_artefact(description = "Some data", files = "data.rds")
 con <- orderly.db::orderly_db_connection()
 dat <- orderly.db::orderly_db_query("SELECT * FROM mtcars")
 
