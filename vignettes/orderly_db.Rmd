@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `orderly.db` package is an `orderly2` plugin which provides support for interacting with databases. It includes all core features that `orderly` (version 1) supported, but with the new syntax.
+The `orderly.db` package is an [`orderly`](https://mrc-ide.github.io/orderly/) plugin which provides support for interacting with databases. It includes all core features that `orderly` (version 1) supported, but with the new syntax.
 
 This documentation is based off the original orderly vignette. There is a section at the end of the vignette with some comparisons of old and new syntaxes.
 
@@ -60,12 +60,12 @@ In this case, the query `SELECT * FROM mtcars WHERE cyl = 4` will be run against
 You can interpolate parameters into the query; for example you might have:
 
 ```r
-orderly2::orderly_parameter(cyl = NULL)
+orderly::orderly_parameter(cyl = NULL)
 orderly.db::orderly_db_data(as = "cars", database = "source",
                              query = "SELECT * FROM mtcars WHERE cyl = ?cyl")
 ```
 
-In the above, we declare an orderly parameter `cyl` with no default (see `?orderly2::orderly_parameter`) and use `?cyl` to interpolate that into the query (see `?DBI::sqlInterpolate` which does the interpolation for us). You can only use orderly varibles for this; if you need more complex substitution you can create strings using `paste` or `sprintf` as suits your needs.
+In the above, we declare an orderly parameter `cyl` with no default (see `?orderly::orderly_parameter`) and use `?cyl` to interpolate that into the query (see `?DBI::sqlInterpolate` which does the interpolation for us). You can only use orderly varibles for this; if you need more complex substitution you can create strings using `paste` or `sprintf` as suits your needs.
 
 You can establish temporary views in the database in order to simplify queries. For example, you might write:
 

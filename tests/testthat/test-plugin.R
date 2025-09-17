@@ -10,7 +10,7 @@ test_that("basic plugin use works", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "query")
 
@@ -38,7 +38,7 @@ test_that("can name output for later reference", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$name, "input")
 })
@@ -60,7 +60,7 @@ test_that("allow connection", {
   ## Connection should now have been invalidated:
   expect_false(DBI::dbIsValid(env$con))
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "connection"))
 
@@ -92,7 +92,7 @@ test_that("allow connection without data", {
   expect_equal(readRDS(file.path(path, "data.rds")),
                mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(names(meta_db), "connection")
 
@@ -213,7 +213,7 @@ test_that("can construct a view, then read from it", {
     ## created it.
     expect_equal(DBI::dbListTables(con), "mtcars"))
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_setequal(names(meta_db), c("query", "view"))
   expect_equal(meta_db$view,
@@ -230,7 +230,7 @@ test_that("can read a query from a file", {
   env <- new.env()
   id <- orderly_run_quietly("query", root = root, envir = env)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$query,
                readLines(file.path(root, "src", "query", "query.sql")))
@@ -250,7 +250,7 @@ test_that("can run a report with instances", {
   expect_equal(d1, mtcars_db[1:10, ])
   expect_equal(d2, mtcars_db)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(meta_db$query$instance, c("main", "dev"))
   expect_equal(meta_db$query$rows, c(10, 32))
@@ -268,7 +268,7 @@ test_that("can interpolate parameters into query", {
   rownames(cmp) <- NULL
   expect_equal(d, cmp)
 
-  meta <- orderly2::orderly_metadata(id, root)
+  meta <- orderly::orderly_metadata(id, root)
   meta_db <- meta$custom$orderly.db
   expect_equal(
     meta_db$query$query,

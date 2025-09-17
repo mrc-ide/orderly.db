@@ -1,6 +1,6 @@
 .onLoad <- function(...) {
   # nocov start
-  orderly2::orderly_plugin_register(
+  orderly::orderly_plugin_register(
     "orderly.db",
     config = orderly_db_config,
     serialise = orderly_db_serialise,

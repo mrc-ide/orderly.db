@@ -6,7 +6,7 @@
 [![codecov.io](https://codecov.io/github/mrc-ide/orderly.db/coverage.svg?branch=main)](https://codecov.io/github/mrc-ide/orderly.db?branch=main)
 <!-- badges: end -->
 
-This is an [`orderly2`](https://mrc-ide.github.io/orderly2) plugin for database access. We expect this package to be part of the group of packages that becomes the next version of [`orderly`](https://vaccineimpact.org/orderly), though this particular package may take a while to end up on CRAN.
+This is an [`orderly`](https://mrc-ide.github.io/orderly/) plugin for database access.
 
 See `[vignette("introduction", package = "orderly.db")]` for details, and for information for migrating from `orderly`.
 

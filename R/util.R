@@ -112,4 +112,4 @@ get_or_na_string <- function(name) {
 
 
 ## this one is fairly unpleasant
-file_exists <- orderly2:::file_exists
+file_exists <- orderly:::file_exists
