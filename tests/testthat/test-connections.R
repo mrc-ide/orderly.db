@@ -2,7 +2,7 @@ test_that("validate connections when one is present", {
   config <- orderly_db_config(
     list(db = list(driver = "RSQLite::SQLite",
                    args = list(dbname = ":memory:"))),
-    "config.yml")
+    "orderly_config.json")
   obj <- connections$new(config)
   con1 <- obj$open(NULL, NULL)
   expect_identical(obj$open(NULL, NULL), con1)
@@ -19,7 +19,7 @@ test_that("validate connections when two are present", {
               args = list(dbname = ":memory:"))
   config <- orderly_db_config(
     list(db1 = cfg, db2 = cfg),
-    "config.yml")
+    "orderly_config.json")
 
   obj <- connections$new(config)
 
@@ -46,7 +46,7 @@ test_that("find and clean local connections", {
   config <- orderly_db_config(
     list(db = list(driver = "RSQLite::SQLite",
                    args = list(dbname = ":memory:"))),
-    "config.yml")
+    "orderly_config.json")
   obj <- local_connections(key, config, env)
   expect_s3_class(obj, "connections")
   expect_identical(local_connections(key, config, env), obj)
@@ -67,10 +67,10 @@ test_that("changing the configuration invalidates connections", {
               args = list(dbname = ":memory:"))
   config1 <- orderly_db_config(
     list(db1 = cfg),
-    "config.yml")
+    "orderly_config.json")
   config2 <- orderly_db_config(
     list(db1 = cfg, db2 = cfg),
-    "config.yml")
+    "orderly_config.json")
   obj1 <- local_connections(key, config1, env)
   con1 <- obj1$open("db1", NULL)
   expect_true(DBI::dbIsValid(con1$connection))

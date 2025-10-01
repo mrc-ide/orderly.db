@@ -19,7 +19,7 @@ Imports:
     DBI,
     fs,
     jsonlite,
-    orderly (>= 1.99.85)
+    orderly (>= 1.99.90)
 Suggests:
     RSQLite,
     jsonvalidate (>= 1.4.0),

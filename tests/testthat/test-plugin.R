@@ -104,30 +104,30 @@ test_that("allow connection without data", {
 
 test_that("validate plugin configuration", {
   expect_error(
-    orderly_db_config(list(), "orderly_config.yml"),
+    orderly_db_config(list(), "orderly_config.json"),
     "must contain at least one database")
   expect_error(
-    orderly_db_config(list(db = list()), "orderly_config.yml"),
-    "Fields missing from orderly_config.yml:orderly.db:db: driver")
+    orderly_db_config(list(db = list()), "orderly_config.json"),
+    "Fields missing from orderly_config.json:orderly.db:db: driver")
   expect_error(
     orderly_db_config(list(db = list(driver = NULL, args = NULL)),
-                      "orderly_config.yml"),
-    "'orderly_config.yml:orderly.db:db:driver' must be a scalar")
+                      "orderly_config.json"),
+    "'orderly_config.json:orderly.db:db:driver' must be a scalar")
   expect_error(
     orderly_db_config(list(db = list(driver = "db", args = NULL)),
-                      "orderly_config.yml"),
+                      "orderly_config.json"),
     paste("Expected fully qualified name for",
-          "orderly_config.yml:orderly.db:db:driver"))
+          "orderly_config.json:orderly.db:db:driver"))
   expect_error(
     orderly_db_config(list(db = list(driver = "pkg::db", args = NULL)),
-                      "orderly_config.yml"),
-    "'orderly_config.yml:orderly.db:db:args' must be named")
+                      "orderly_config.json"),
+    "'orderly_config.json:orderly.db:db:args' must be named")
 
   ## Success:
   expect_equal(
     orderly_db_config(
       list(db = list(driver = "pkg::db", args = list(a = 1))),
-      "orderly_config.yml"),
+      "orderly_config.json"),
     list(db = list(driver = c("pkg", "db"),
                    args = list(a = 1),
                    instances = list(default = list(a = 1)),
@@ -149,7 +149,7 @@ test_that("validate db for sqlite", {
     orderly_db_config(
       list(db = list(driver = "RSQLite::SQLite",
                      args = list(dbname = db))),
-      "orderly_config.yml"),
+      "orderly_config.json"),
     expected)
   withr::with_dir(
     dirname(db),
@@ -157,7 +157,7 @@ test_that("validate db for sqlite", {
       orderly_db_config(
         list(db = list(driver = "RSQLite::SQLite",
                        args = list(dbname = basename(db)))),
-        "orderly_config.yml"),
+        "orderly_config.json"),
       expected))
 })
 
@@ -189,7 +189,7 @@ test_that("sensible error if no databases configured", {
   root <- test_prepare_example("minimal", list())
   expect_error(
     orderly_run_quietly("minimal", root = root, envir = env),
-    "orderly_config.yml:orderly.db must contain at least one database",
+    "orderly_config.json:orderly.db must contain at least one database",
     fixed = TRUE)
 })
 
