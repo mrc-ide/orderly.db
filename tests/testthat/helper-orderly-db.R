@@ -10,40 +10,30 @@ test_prepare_example <- function(examples, data) {
   withr::defer_parent(unlink(tmp, recursive = TRUE))
   suppressMessages(orderly::orderly_init(tmp))
 
-  base <- list("minimum_orderly_version", "1.99.90")
-
-  stop("writeme")
+  nms <- names(data)
+  dbs <- set_names(sprintf("%s.sqlite", nms), nms)
 
   if (identical(examples, "instance")) {
-    fmt <- paste(
-      "        %s:",
-      "          dbname: %s.sqlite",
-      sep = "\n")
-    cfg <- c(
-      "plugins:",
-      "  orderly.db:",
-      "    db:",
-      "      driver: RSQLite::SQLite",
-      "      args: ~",
-      "      instances:",
-      sprintf(fmt, names(data), names(data)))
+    cfg_plugins <- list(
+      db = list(
+        driver = "RSQLite::SQLite",
+        args = NULL,
+        instances = lapply(dbs, function(x) list(dbname = x))))
   } else {
-    fmt <- paste(
-      "    %s:",
-      "      driver: RSQLite::SQLite",
-      "      args:",
-      "        dbname: %s.sqlite",
-      sep = "\n")
-    cfg <- c(
-      "plugins:",
-      "  orderly.db:",
-      sprintf(fmt, names(data), names(data)))
+    cfg_plugins <- lapply(dbs, function(x) {
+      list(driver = "RSQLite::SQLite", args = list(dbname = x))
+    })
   }
-  writeLines(c(cfg_base, cfg), file.path(tmp, "orderly_config.json"))
+
+  cfg <- list(minimum_orderly_version = "1.99.90",
+              plugins = list(orderly.db = cfg_plugins))
+  writeLines(jsonlite::toJSON(cfg, auto_unbox = TRUE, null = "null"),
+             file.path(tmp, "orderly_config.json"))
 
   for (nm_db in names(data)) {
     con <- DBI::dbConnect(RSQLite::SQLite(),
-                          dbname = file.path(tmp, paste0(nm_db, ".sqlite")))
+                          dbname = file.path(tmp, dbs[[nm_db]]))
+    d <- data[[nm_db]]
     for (nm_data in names(data[[nm_db]])) {
       DBI::dbWriteTable(con, nm_data, data[[nm_db]][[nm_data]])
     }
