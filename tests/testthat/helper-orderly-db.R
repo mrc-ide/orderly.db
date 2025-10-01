@@ -10,7 +10,9 @@ test_prepare_example <- function(examples, data) {
   withr::defer_parent(unlink(tmp, recursive = TRUE))
   suppressMessages(orderly::orderly_init(tmp))
 
-  cfg_base <- "minimum_orderly_version: 1.99.0"
+  base <- list("minimum_orderly_version", "1.99.90")
+
+  stop("writeme")
 
   if (identical(examples, "instance")) {
     fmt <- paste(
@@ -37,7 +39,7 @@ test_prepare_example <- function(examples, data) {
       "  orderly.db:",
       sprintf(fmt, names(data), names(data)))
   }
-  writeLines(c(cfg_base, cfg), file.path(tmp, "orderly_config.yml"))
+  writeLines(c(cfg_base, cfg), file.path(tmp, "orderly_config.json"))
 
   for (nm_db in names(data)) {
     con <- DBI::dbConnect(RSQLite::SQLite(),

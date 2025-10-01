@@ -20,19 +20,25 @@ This documentation is based off the original orderly vignette. There is a sectio
 
 ## Configuration
 
-The root `orderly_config.yml` configuration specifies the locations of databases (there can be any number), within the plugins section. For example,
+The root `orderly_config.json` configuration specifies the locations of databases (there can be any number), within the plugins section. For example,
 
-```yaml
-plugins:
-  orderly.db:
-    source:
-      driver: RPostgres::Postgres
-      args:
-        host: dbhost.example.org
-        port: 5432
-        user: myusername
-        password: s3cret
-        dbname: mydb
+```json
+{
+  "plugins": {
+    "orderly.db": {
+      "source": {
+        "driver": "RPostgres::Postgres",
+        "args": {
+          "host": "dbhost.example.org",
+          "port": 5432,
+          "user": "myusername",
+          "password": "s3cret",
+          "dbname": "mydb"
+        }
+      }
+    }
+  }
+}
 ```
 
 This database will be referred to elsewhere as `source` and it will be connected with the `RPostgres::Postgres` driver (from the [RPostgres](https://cran.r-project.org/package=RPostgres) package).  Arguments within the `args` block will be passed to the driver, in this case being the equivalent of:
@@ -42,7 +48,7 @@ DBI::dbConnect(RPostgres::Postgres, host = "dbhost.example.org", port = 5432,
                user = "myusername", password = "s3cret", dbname = "mydb")
 ```
 
-The values used in the `args` blocks can be environment values (e.g., `password: $DB_PASSWORD`) in which case they will be resolved from the environment before connecting (including from `orderly_envir.yml`).  This will be useful for keeping secrets out of source control.
+The values used in the `args` blocks can be environment values (e.g., `password: $DB_PASSWORD`) in which case they will be resolved from the environment before connecting (including from `orderly_envir.json`).  This will be useful for keeping secrets out of source control.
 
 For [SQLite](https://cran.r-project.org/package=RSQLite) databases, the `args` block will typically contain only `dbname` which is the path to the database file.
 
@@ -91,38 +97,50 @@ which will save the connection to the `source` database as the R object `con`.  
 
 ### Environment variables for passwords
 
-The contents of `orderly_config.yml` may contain things like secrets
+The contents of `orderly_config.json` may contain things like secrets
 (passwords) or hostnames that vary depending on deployment (e.g.,
 testing locally vs running on a remote system).  To customise this,
 you can use environment variables within the configuration.  So
 rather than writing
 
-```yaml
-plugins:
-  orderly.db:
-    source:
-      driver: RPostgres::Postgres
-      args:
-        host: localhost
-        port: 5432
-        user: myuser
-        dbname: databasename
-        password: p4ssw0rd
+```json
+{
+  "plugins": {
+    "orderly.db": {
+      "source": {
+        "driver": "RPostgres::Postgres",
+        "args": {
+          "host": "dbhost.example.org",
+          "port": 5432,
+          "user": "myuser",
+          "dbname": "databasename",
+          "password": "s3cret"
+        }
+      }
+    }
+  }
+}
 ```
 
 you might write
 
-```yaml
-plugins:
-  orderly.db:
-    source:
-      driver: RPostgres::Postgres
-      args:
-        host: $MY_DBHOST
-        port: $MY_DBPORT
-        user: $MY_DBUSER
-        dbname: $MY_DBNAME
-        password: $MY_PASSWORD
+```json
+{
+  "plugins": {
+    "orderly.db": {
+      "source": {
+        "driver": "RPostgres::Postgres",
+        "args": {
+          "host": "dbhost.example.org",
+          "port": 5432,
+          "user": "$MY_DBUSER",
+          "dbname": "databasename",
+          "password": "$MY_PASSWORD"
+        }
+      }
+    }
+  }
+}
 ```
 
 environment variables, as used this way **must** begin with a
@@ -131,17 +149,14 @@ underscore character.  You can then set the environment variables
 in an `.Renviron` (either within the project or in your home
 directory) file or your `.profile` file.  Alternatively, you can
 create a file `orderly_envir.yml` in the same directory as
-`orderly_config.yml` with key-value pairs, such as
+`orderly_config.json` with key-value pairs, such as
 
 ```yaml
-MY_DBHOST: localhost
-MY_DBPORT: 5432
 MY_DBUSER: myuser
-MY_DBNAME: databasename
 MY_PASSWORD: p4ssw0rd
 ```
 
-This is read every time that `orderly_config.yml` is read (in
+This is read every time that `orderly_config.json` is read (in
 contrast with `.Renviron` which is read-only at the start of a
 session).  This will likely be more pleasant to work with.
 
@@ -157,23 +172,31 @@ The above approach can be used to switch databases by using different environmen
 
 To configure this situation, list common arguments within the `args` block as before, then add logical databases as named entries in an `instances` field:
 
-```
-plugins:
-  orderly.db:
-    source:
-      driver: RPostgres::Postgres
-      args:
-        port: 5432
-        user: user
-        dbname: mydb
-      instances:
-        production:
-          host: production.example.org
-          password: $PASSWORD_PRODUCTION
-        staging:
-          host: staging.example.org
-          password: $PASSWORD_STAGING
-      default_instance: $DEFAULT_INSTANCE
+```json
+{
+  "plugins": {
+    "orderly.db": {
+      "source": {
+        "driver": "RPostgres::Postgres",
+        "args": {
+          "port": 5432,
+          "user": "myusername",
+          "dbname": "mydb"
+        },
+        "instances": {
+          "production": {
+            "host": "production.example.org",
+            "password": "$PASSWORD_PRODUCTION"
+          },
+          "staging": {
+            "host": "staging.example.org",
+            "password": "$PASSWORD_STAGING"
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
 Here - staging and production have different hostnames (`production.example.org` and `staging.example.org`) and different passwords (retrieved using environment variables) and the default instance is set with another environment variable (`$DEFAULT_INSTANCE`, which must be one of `production` or `staging`).  To switch between databases, you can set that variable, or pass the `instance` argument to `orderly.db::orderly_db_data` and friends, as:
@@ -193,6 +216,8 @@ orderly.db::orderly_db_data(as = "cars", database = "source", query = query,
 If you pass a value of `NULL` for `instance`, then we fall back on the default instance (and if none is specified, throw an error).  You might like to make this a parameter to your report to allow changing the instance dynamically when running.
 
 ## Migrating from orderly v1
+
+Here, we show yaml snippets that would have worked with orderly version 1 and the corresponding R code that you would use with this plugin
 
 Querying for data
 
