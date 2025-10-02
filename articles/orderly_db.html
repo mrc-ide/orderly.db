@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">orderly.db</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.5</span>
       </span>
     </div>
 
@@ -94,19 +94,25 @@ new syntaxes.</p>
 <div class="section level2">
 <h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
 </h2>
-<p>The root <code>orderly_config.yml</code> configuration specifies the
+<p>The root <code>orderly_config.json</code> configuration specifies the
 locations of databases (there can be any number), within the plugins
 section. For example,</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">plugins</span><span class="kw">:</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="at">  </span><span class="fu">orderly.db</span><span class="kw">:</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="at">      </span><span class="fu">driver</span><span class="kw">:</span><span class="at"> RPostgres::Postgres</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="at">      </span><span class="fu">args</span><span class="kw">:</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="at">        </span><span class="fu">host</span><span class="kw">:</span><span class="at"> dbhost.example.org</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="at">        </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">5432</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="at">        </span><span class="fu">user</span><span class="kw">:</span><span class="at"> myusername</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="at">        </span><span class="fu">password</span><span class="kw">:</span><span class="at"> s3cret</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="at">        </span><span class="fu">dbname</span><span class="kw">:</span><span class="at"> mydb</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="dt">"plugins"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="dt">"orderly.db"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>      <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>        <span class="dt">"driver"</span><span class="fu">:</span> <span class="st">"RPostgres::Postgres"</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>        <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>          <span class="dt">"host"</span><span class="fu">:</span> <span class="st">"dbhost.example.org"</span><span class="fu">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>          <span class="dt">"port"</span><span class="fu">:</span> <span class="dv">5432</span><span class="fu">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>          <span class="dt">"user"</span><span class="fu">:</span> <span class="st">"myusername"</span><span class="fu">,</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>          <span class="dt">"password"</span><span class="fu">:</span> <span class="st">"s3cret"</span><span class="fu">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>          <span class="dt">"dbname"</span><span class="fu">:</span> <span class="st">"mydb"</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>This database will be referred to elsewhere as <code>source</code>
 and it will be connected with the <code>RPostgres::Postgres</code>
 driver (from the <a href="https://cran.r-project.org/package=RPostgres" class="external-link">RPostgres</a>
@@ -118,8 +124,8 @@ the driver, in this case being the equivalent of:</p>
 <p>The values used in the <code>args</code> blocks can be environment
 values (e.g., <code>password: $DB_PASSWORD</code>) in which case they
 will be resolved from the environment before connecting (including from
-<code>orderly_envir.yml</code>). This will be useful for keeping secrets
-out of source control.</p>
+<code>orderly_envir.json</code>). This will be useful for keeping
+secrets out of source control.</p>
 <p>For <a href="https://cran.r-project.org/package=RSQLite" class="external-link">SQLite</a>
 databases, the <code>args</code> block will typically contain only
 <code>dbname</code> which is the path to the database file.</p>
@@ -183,45 +189,54 @@ script.</p>
 <div class="section level3">
 <h3 id="environment-variables-for-passwords">Environment variables for passwords<a class="anchor" aria-label="anchor" href="#environment-variables-for-passwords"></a>
 </h3>
-<p>The contents of <code>orderly_config.yml</code> may contain things
+<p>The contents of <code>orderly_config.json</code> may contain things
 like secrets (passwords) or hostnames that vary depending on deployment
 (e.g., testing locally vs running on a remote system). To customise
 this, you can use environment variables within the configuration. So
 rather than writing</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">plugins</span><span class="kw">:</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="at">  </span><span class="fu">orderly.db</span><span class="kw">:</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="at">      </span><span class="fu">driver</span><span class="kw">:</span><span class="at"> RPostgres::Postgres</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="at">      </span><span class="fu">args</span><span class="kw">:</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="at">        </span><span class="fu">host</span><span class="kw">:</span><span class="at"> localhost</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="at">        </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">5432</span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="at">        </span><span class="fu">user</span><span class="kw">:</span><span class="at"> myuser</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="at">        </span><span class="fu">dbname</span><span class="kw">:</span><span class="at"> databasename</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="at">        </span><span class="fu">password</span><span class="kw">:</span><span class="at"> p4ssw0rd</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="dt">"plugins"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    <span class="dt">"orderly.db"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>      <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>        <span class="dt">"driver"</span><span class="fu">:</span> <span class="st">"RPostgres::Postgres"</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>        <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>          <span class="dt">"host"</span><span class="fu">:</span> <span class="st">"dbhost.example.org"</span><span class="fu">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>          <span class="dt">"port"</span><span class="fu">:</span> <span class="dv">5432</span><span class="fu">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>          <span class="dt">"user"</span><span class="fu">:</span> <span class="st">"myuser"</span><span class="fu">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>          <span class="dt">"dbname"</span><span class="fu">:</span> <span class="st">"databasename"</span><span class="fu">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>          <span class="dt">"password"</span><span class="fu">:</span> <span class="st">"s3cret"</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>you might write</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">plugins</span><span class="kw">:</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="at">  </span><span class="fu">orderly.db</span><span class="kw">:</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="at">    </span><span class="fu">source</span><span class="kw">:</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="at">      </span><span class="fu">driver</span><span class="kw">:</span><span class="at"> RPostgres::Postgres</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="at">      </span><span class="fu">args</span><span class="kw">:</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="at">        </span><span class="fu">host</span><span class="kw">:</span><span class="at"> $MY_DBHOST</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="at">        </span><span class="fu">port</span><span class="kw">:</span><span class="at"> $MY_DBPORT</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="at">        </span><span class="fu">user</span><span class="kw">:</span><span class="at"> $MY_DBUSER</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="at">        </span><span class="fu">dbname</span><span class="kw">:</span><span class="at"> $MY_DBNAME</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="at">        </span><span class="fu">password</span><span class="kw">:</span><span class="at"> $MY_PASSWORD</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="dt">"plugins"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    <span class="dt">"orderly.db"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>      <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>        <span class="dt">"driver"</span><span class="fu">:</span> <span class="st">"RPostgres::Postgres"</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>        <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>          <span class="dt">"host"</span><span class="fu">:</span> <span class="st">"dbhost.example.org"</span><span class="fu">,</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>          <span class="dt">"port"</span><span class="fu">:</span> <span class="dv">5432</span><span class="fu">,</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>          <span class="dt">"user"</span><span class="fu">:</span> <span class="st">"$MY_DBUSER"</span><span class="fu">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>          <span class="dt">"dbname"</span><span class="fu">:</span> <span class="st">"databasename"</span><span class="fu">,</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>          <span class="dt">"password"</span><span class="fu">:</span> <span class="st">"$MY_PASSWORD"</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>environment variables, as used this way <strong>must</strong> begin
 with a dollar sign and consist only of uppercase letters, numbers and
 the underscore character. You can then set the environment variables in
 an <code>.Renviron</code> (either within the project or in your home
 directory) file or your <code>.profile</code> file. Alternatively, you
 can create a file <code>orderly_envir.yml</code> in the same directory
-as <code>orderly_config.yml</code> with key-value pairs, such as</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">MY_DBHOST</span><span class="kw">:</span><span class="at"> localhost</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">MY_DBPORT</span><span class="kw">:</span><span class="at"> </span><span class="dv">5432</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">MY_DBUSER</span><span class="kw">:</span><span class="at"> myuser</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="fu">MY_DBNAME</span><span class="kw">:</span><span class="at"> databasename</span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">MY_PASSWORD</span><span class="kw">:</span><span class="at"> p4ssw0rd</span></span></code></pre></div>
-<p>This is read every time that <code>orderly_config.yml</code> is read
+as <code>orderly_config.json</code> with key-value pairs, such as</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">MY_DBUSER</span><span class="kw">:</span><span class="at"> myuser</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">MY_PASSWORD</span><span class="kw">:</span><span class="at"> p4ssw0rd</span></span></code></pre></div>
+<p>This is read every time that <code>orderly_config.json</code> is read
 (in contrast with <code>.Renviron</code> which is read-only at the start
 of a session). This will likely be more pleasant to work with.</p>
 <p>The advantage of using environment variables is that you can add the
@@ -245,22 +260,30 @@ copies that we use for experimentation.</p>
 <p>To configure this situation, list common arguments within the
 <code>args</code> block as before, then add logical databases as named
 entries in an <code>instances</code> field:</p>
-<pre><code>plugins:
-  orderly.db:
-    source:
-      driver: RPostgres::Postgres
-      args:
-        port: 5432
-        user: user
-        dbname: mydb
-      instances:
-        production:
-          host: production.example.org
-          password: $PASSWORD_PRODUCTION
-        staging:
-          host: staging.example.org
-          password: $PASSWORD_STAGING
-      default_instance: $DEFAULT_INSTANCE</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="dt">"plugins"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>    <span class="dt">"orderly.db"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>      <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>        <span class="dt">"driver"</span><span class="fu">:</span> <span class="st">"RPostgres::Postgres"</span><span class="fu">,</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>        <span class="dt">"args"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>          <span class="dt">"port"</span><span class="fu">:</span> <span class="dv">5432</span><span class="fu">,</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>          <span class="dt">"user"</span><span class="fu">:</span> <span class="st">"myusername"</span><span class="fu">,</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>          <span class="dt">"dbname"</span><span class="fu">:</span> <span class="st">"mydb"</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>        <span class="dt">"instances"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>          <span class="dt">"production"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>            <span class="dt">"host"</span><span class="fu">:</span> <span class="st">"production.example.org"</span><span class="fu">,</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>            <span class="dt">"password"</span><span class="fu">:</span> <span class="st">"$PASSWORD_PRODUCTION"</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>          <span class="fu">},</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>          <span class="dt">"staging"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>            <span class="dt">"host"</span><span class="fu">:</span> <span class="st">"staging.example.org"</span><span class="fu">,</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>            <span class="dt">"password"</span><span class="fu">:</span> <span class="st">"$PASSWORD_STAGING"</span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>          <span class="fu">}</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>Here - staging and production have different hostnames
 (<code>production.example.org</code> and
 <code>staging.example.org</code>) and different passwords (retrieved
@@ -286,6 +309,9 @@ to allow changing the instance dynamically when running.</p>
 <div class="section level2">
 <h2 id="migrating-from-orderly-v1">Migrating from orderly v1<a class="anchor" aria-label="anchor" href="#migrating-from-orderly-v1"></a>
 </h2>
+<p>Here, we show yaml snippets that would have worked with orderly
+version 1 and the corresponding R code that you would use with this
+plugin</p>
 <p>Querying for data</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="at">  </span><span class="fu">cars</span><span class="kw">:</span></span>
