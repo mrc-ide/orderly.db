@@ -1,6 +1,6 @@
 Package: orderly.db
 Title: Database Support for 'orderly'
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
                     email = "rich.fitzjohn@gmail.com"),
              person("Imperial College of Science, Technology and Medicine",
@@ -19,7 +19,7 @@ Imports:
     DBI,
     fs,
     jsonlite,
-    orderly (>= 1.99.85)
+    orderly (>= 1.99.90)
 Suggests:
     RSQLite,
     jsonvalidate (>= 1.4.0),
